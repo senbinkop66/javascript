@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>ES learn</title>
+</head>
+<body>
+
+	<h1>ECMAScript</h1>
+
+	<h2>ES7 新特性</h2>
+
+	<hr>
+	<h3>Array.prototype.includes</h3>
+	<p>判断数组中是否包含某元素，返回布尔类型值；语法：arr.includes(元素值)；</p>
+	<script>
+		let arr1=[2,3,1,5,7];
+		console.log(Array.prototype.includes(4));  //false
+	</script>
+
+	<hr>
+	<h3>指数操作符</h3>
+	<p>在 ES7 中引入指数运算符「**」，用来实现幂运算，功能与 Math.pow 结果相同；幂运算的简化写法，例如：2的10次方：2**10；</p>
+	<script>
+		console.log(Math.pow(3,4));  //81
+		console.log(3**4);  //81
+	</script>
+
+	<hr>
+	<h2>ES8 新特性</h2>
+
+	<h3>async 和 await</h3>
+	<p>简化异步函数的写法；</p>
+	<p>async 和 await 两种语法结合可以让异步代码看起来像同步代码一样；</p>
+	<h4>async 函数</h4>
+	<p>1. async 函数的返回值为 promise 对象；<br>2. promise 对象的结果由 async 函数执行的返回值决定；</p>
+
+	<script>
+		//async函数，异步函数
+		async function fn1(){
+			//若返回的是Promise对象，那么返回的结果就是Promise对象的结果
+			return new Promise((resolve,reject)=>{
+				resolve("successful!");
+				reject("failed!");
+			})
+		}
+		const result1=fn1();
+		console.log(result1);  //Promise {<pending>}
+		result1.then(value=>{
+			console.log(value);
+		},reason=>{
+			console.warn(reason);
+		});
+	</script>
+
+	<h4>await 表达式：</h4>
+	<ol>
+		<li>await 必须写在 async 函数中；</li>
+		<li>await 右侧的表达式一般为 promise 对象；</li>
+		<li>await 返回的是 promise 成功的值；</li>
+		<li>await 的 promise 失败了, 就会抛出异常, 需要通过 try...catch 捕获处理；</li>
+	</ol>
+	<script>
+		//async函数 + await表达式：异步函数
+		//创建Promise对象
+		const p1=new Promise((resolve,reject)=>{
+			resolve("successful!");
+			reject("failed!");
+		});
+		async function fn2(){
+			//await 返回的是 promise 成功的值
+			let result2=await p1;
+			console.log(result2);  //successful!
+		}
+	</script>
+
+	<hr>
+	<h3>对象方法扩展</h3>
+	<h4>Object.values()方法：返回一个给定对象的所有可枚举属性值的数组；</h4>
+	<h4>Object.entries()方法：返回一个给定对象自身可遍历属性 [key,value] 的数组；</h4>
+	<h4>Object.getOwnPropertyDescriptors()该方法：返回指定对象所有自身属性的描述对象；</h4>
+	<script type="text/javascript">
+		//对象方法扩展
+		let club={
+			name:"liverpool",
+			age:89,
+			location:"England"
+		}
+		//获取对象所有的键
+		console.log(Object.keys(club));  //["name", "age", "location"]
+		//获取对象所有的值
+		console.log(Object.values(club));  //["liverpool", 89, "England"]
+		//获取对象的entries
+		console.log(Object.entries(club));  //[Array(2), Array(2), Array(2)]
+		//创建map
+		const map=new Map(Object.entries(club));
+		console.log(map);  //{"name" => "liverpool", "age" => 89, "location" => "England"}
+		console.log(map.get("name"));
+		//返回指定对象所有自身属性的描述对象
+		console.log(Object.getOwnPropertyDescriptors(club));
+
+	</script>
+	<hr>
+
+	<h2>ES9 新特性</h2>
+
+	<h3>Rest 参数与 spread 扩展运算符</h3>
+	<p>在对象中使Rest参数与spread扩展运算符；</p>
+	<p>Rest 参数与 spread 扩展运算符在 ES6 中已经引入，不过 ES6 中只针对于数组，在 ES9 中为对象提供了像数组一样的 rest 参数和扩展运算符；</p>
+	<script>
+		//rest参数
+		function connect({
+			host,
+			port,
+			...user
+		}){
+			console.log(host);
+			console.log(port);
+			console.log(user);
+		}
+		connect({
+			host:"127.0.0.1",
+			port:8080,
+			username:"root",
+			passward:"123",
+			type:"master"
+		});  //{username: "root", passward: "123", type: "master"}
+
+		//对象合并
+		const skill1={
+			q:"quit"
+		}
+		const skill2={
+			w:"write"
+		}
+		const skill3={
+			r:"read"
+		}
+		const skill4={
+			x:"excute",
+			e:"exit"
+		}
+		const shellskill={
+			...skill1,
+			...skill2,
+			...skill3,
+			...skill4,
+		};
+		console.log(shellskill);  //{q: "quit", w: "write", r: "read", x: "excute", e: "exit"}
+	</script>
+
+	<hr>
+	<h3>正则扩展：命名捕获分组</h3>
+	<p>ES9 允许命名捕获组使用符号『?』,这样获取捕获结果可读性更强；</p>
+	<script>
+		//提取url和标签内文本
+		let str4='<a href="https://www.baidu.com">baidu</a>';
+		//方法1
+		const reg1=/<a href="(.*)">(.*)<\/a>/;
+		const result4=reg1.exec(str4);
+		console.log(result4);
+		console.log(result4[1]);  //https://www.baidu.com
+		console.log(result4[2]);  //baidu
+		console.log(result4[0]);  //<a href="https://www.baidu.com">baidu</a>
+
+		//方法2
+		//命名捕获分组
+		const reg2=/<a href="(?<url>.*)">(?<text>.*)<\/a>/;
+		const result5=reg2.exec(str4);
+		console.log(result5);
+		console.log(result5.groups.url);  //https://www.baidu.com
+		console.log(result5.groups.text);  //baidu
+
+	</script>
+
+	<hr>
+	<h3>正则扩展：反向断言</h3>
+	<p>ES9 支持反向断言，通过对匹配结果前面的内容进行判断，对匹配进行筛选；</p>
+	<script>
+		let str5="fiai332doem490333fdo";
+		//只匹配333
+		//正向断言
+		//const reg3=/\d+(?=f)/;  //490333
+		const reg3=/(?<=0)\d+(?=f)/;  //前面是数字后面是f
+		const result6=reg3.exec(str5);
+		console.log(result6);
+
+		//反向断言
+		const reg4=/(?<=0)\d+/;  //后面是数字前面是0
+		const result7=reg4.exec(str5);  //"333"
+		console.log(result7);  //"333"
+	</script>
+	
+	<hr>
+	<h3>正则扩展：dotAll 模式</h3>
+	<p>正则表达式中点.匹配除回车外的任何单字符，标记『s』改变这种行为，允许行终止符出现；</p>
+	<script type="text/javascript">
+		let str6=`
+		<ol>
+			<li>
+				<a>fruit</a>
+				<p>23</p>
+			</li>
+			<li>
+				<a>vegetable</a>
+				<p>34</p>
+			</li>
+		</ol>
+		`;
+		//提取a和p内容
+		//方法1
+		const reg5=/<li>\s+<a>(.*?)<\/a>\s+<p>(.*?)<\/p>/;
+		const result8=reg5.exec(str6);
+		console.log(result8);
+
+		//方法2  dotALl模式
+		const reg6=/<li>.*?<a>(.*?)<\/a>.*?<p>(.*?)<\/p>/gs;
+		//const result9=reg6.exec(str6);
+		//console.log(result9);
+
+		let result10;
+		let data10=[];
+		while(result10=reg6.exec(str6)){
+			console.log(result10);
+			data10.push({type:result10[1],price:result10[2]})
+		}
+		console.log(data10);
+
+	</script>
+
+	<hr>
+
+	<h2>ES10 新特性</h2>
+
+	<h3>Object.fromEntries</h3>
+	<p>将二维数组或者map转换成对象；Object.entries是将对象转换成二维数组；</p>
+	<script>
+		const sports2=Object.fromEntries([["name","mane"],["age",28]]);
+		console.log(sports2);  //{name: "mane", age: 28}
+		const m2=new Map();
+		m2.set("name","Arnold");
+		m2.set("age",22);
+		console.log(Object.fromEntries(m2));  //{name: "Arnold", age: 22}
+	</script>
+
+	<hr>
+	<h3>trimStart 和 trimEnd</h3>
+	<p>去掉字符串前后的空白字符；类似trimLeft和trimRight</p>
+	<script>
+		let str7="   good afternoon  ";
+		console.log(str7);
+		console.log(str7.trimLeft());
+		console.log(str7.trimStart());
+		console.log(str7.trimRight());
+		console.log(str7.trimEnd());
+		
+	</script>
+
+	<hr>
+	<h3>Array.prototype.flat 与 flatMap</h3>
+	<p>将多维数组转换成低维数组；</p>
+	<script type="text/javascript">
+		const arrm1=[2,3,1,[3,3],9,8,[4,2]];
+		//将二维数组转换成一维数组
+		console.log(arrm1.flat());  //[2, 3, 1, 3, 3, 9, 8, 4, 2]
+		//将三维数组转换成二维数组
+		const arrm2=[2,3,1,[[4,6],3,3],9,8,[4,2]];
+		console.log(arrm2.flat());  //[2, 3, 1, Array(2), 3, 3, 9, 8, 4, 2]
+		//将三维数组转换成一维数组
+		console.log(arrm2.flat(2));  //[2, 3, 1, 4, 6, 3, 3, 9, 8, 4, 2]
+
+		const arrm3=[1,2,3,4,5];
+		const arrm3s1=arrm3.map(item=>item**2);
+		console.log(arrm3s1)  //[1, 4, 9, 16, 25]
+		const arrm3s2=arrm3.map(item=>[item**2]);
+		console.log(arrm3s2)  //[Array(1), Array(1), Array(1), Array(1), Array(1)]
+		const arrm3s3=arrm3.flatMap(item=>[item**2]);
+		console.log(arrm3s3)  //[1, 4, 9, 16, 25]
+
+	</script>
+
+	<hr>
+	<h3>Symbol.prototype.description</h3>
+	<p>获取Symbol的描述字符串</p>
+	<script>
+		let s3=Symbol("奥运");
+		console.log(s3.description);  //奥运
+	</script>
+
+	<hr>
+
+	<h2>ES11 新特性</h2>
+
+	<h3>String.prototype.matchAll</h3>
+	<p>用来得到正则批量匹配的结果；</p>
+	<script>
+		let str62=`
+		<ol>
+			<li>
+				<a>fruit</a>
+				<p>23</p>
+			</li>
+			<li>
+				<a>vegetable</a>
+				<p>34</p>
+			</li>
+		</ol>
+		`;
+		//用来得到正则批量匹配的结果
+		const reg62=/<li>.*?<a>(.*?)<\/a>.*?<p>(.*?)<\/p>/sg;
+		const result62=str62.matchAll(reg62);
+		//返回的是可迭代对象，可用扩展运算符展开
+		console.log(...result62);
+		//使用for...of...遍历
+		for(let v of result62){
+			console.log(v);
+		}
+	</script>
+
+	<hr>
+	<h3>类的私有属性</h3>
+	<p>私有属性外部不可访问直接；</p>
+	<script>
+		//
+		class Person11{
+			//公有属性
+			name;
+			//私有属性
+			#age;
+			#number;
+			//构造方法
+			constructor(name,age,number){
+				this.name=name;
+				this.#age=age;
+				this.#number=number;
+			}
+			intro(){
+				console.log(this.name);
+				console.log(this.#age);
+				console.log(this.#number);
+			}
+		}
+		//实例化
+		const mane=new Person11("Mane",28,10);
+		console.log(mane);  //Person11 {name: "Mane", #age: 28, #number: 10}
+		//公有属性访问
+		console.log(mane.name);  //Mane
+		//私有属性访问
+		console.log(mane.age);  //undefined
+		//console.log(mane.#age);  //报错
+		mane.intro();
+	</script>
+
+	<hr>
+	<h3>Promise.allSettled</h3>
+	<p>获取多个promise执行的结果集；Promise.allSettled</p>
+	<script>
+		const p3=new Promise((resolve,reject)=>{
+			setTimeout(()=>{
+				resolve("数据1");
+			},1000);
+		});
+		const p4=new Promise((resolve,reject)=>{
+			setTimeout(()=>{
+				reject("获取失败");
+			},1000);
+		});
+		//调用Promise.allSettled方法
+		const rep341=Promise.allSettled([p3,p4]);
+		console.log(rep341);
+		const rep342=Promise.all([p3,p4]);
+		console.log(rep342);
+	</script>
+
+	<hr>
+	<h3>可选链操作符 ?.</h3>
+	<p>如果存在则往下走，省略对对象是否传入的层层判断；</p>
+	<script>
+		function main2(config){
+			//方法1
+			//const dbHost=config && config.db && config.db.host;
+			//可选链操作符写法
+			const dbHost=config?.db?.host;
+			console.log(dbHost);
+		}
+		main2({
+			db:{
+				host:"127.0.0.1",
+				username:"root"
+			},
+			cache:{
+				host:"158.34.22",
+				username:"admin"
+			}
+		});
+
+	</script>
+
+	<hr>
+	<h3>动态 import 导入</h3>
+	<p>动态导入模块，什么时候使用时候导入；</p>
+
+	<hr>
+	<h3>BigInt</h3>
+	<p>更大的整数；</p>
+	<script>
+		//大整数
+		let nb=100n;
+		console.log(nb,typeof(nb));  //100n "bigint"
+		//函数：普通整型转大整型
+		let n2=1234;
+		console.log(BigInt(n2));  //1234n
+
+		//用于更大数值的运算
+		let max2=Number.MAX_SAFE_INTEGER;
+		console.log(max2);  //9007199254740991
+		console.log(max2+1);  //9007199254740992
+		console.log(max2+2);  //9007199254740992
+		console.log(BigInt(max2));  //9007199254740991n
+		console.log(BigInt(max2)+BigInt(1));  //9007199254740992n
+		console.log(BigInt(max2)+BigInt(2));  //9007199254740993n
+
+	</script>
+
+	<hr>
+	<h3>globalThis 对象</h3>
+	<p>始终指向全局对象window；</p>
+	<script>
+		console.log(globalThis);
+	</script>
+
+
+
+
+
+
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>

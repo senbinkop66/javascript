@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>ES learn</title>
+</head>
+<body>
+
+	<h1>ECMAScript</h1>
+	<h2>ES6</h2>
+
+	<hr>
+	<h3>let关键字</h3>
+	<p>用来声明变量</p>
+	<ol>
+		<li class="item1">变量不能重复声明</li>
+		<li class="item1">块级作用域（局部变量）</li>
+		<li class="item1">不存在变量提升(即变量不能在创建之前使用）</li>
+		<li class="item1">不影响作用域链（代码块内有代码）</li>
+	</ol>
+
+	<script>
+		//生命变量
+		let a;
+		let b=66,c="mane",d=[];
+		{
+			let e=2;
+			console.log("局部变量e",e);
+		}
+		let e=3;
+		console.log(e);
+		{
+			let name="ES6";
+			function printName(){
+				console.log(name);
+			}
+			printName();
+		}
+
+		//获取元素
+		let items=document.getElementsByTagName("li");
+		//遍历并绑定事件
+		for (let i=0; i<items.length;i++){
+			items[i].onclick=function(){
+				items[i].style.background="#fed892";
+			}
+		}
+
+
+	</script>
+
+
+
+	<hr>
+	<h3>const关键字</h3>
+	<p>用来定义常量</p>
+	<ol>
+		<li>一定要赋初始值</li>
+		<li>一般常量使用大写</li>
+		<li>不允许重复声明</li>
+		<li>常量的值不能修改</li>
+		<li>块级作用域</li>
+		<li>对于数组和对象元素的修改，不算是对常量的修改(数组和对象存的是引用地址）</li>
+	</ol>
+	<p>声明对象类型使用 const，非对象类型声明选择 let</p>
+
+	<script>
+		//声明常量
+		const PI=3.14;
+		console.log(PI);
+	</script>
+
+	<hr>
+	<h3>变量和对象的解构赋值</h3>
+	<p>ES6 允许按照一定模式，从数组和对象中提取值，对变量进行赋值，这被称为解构赋值；</p>
+	<p>频繁使用对象方法、数组元素，就可以使用解构赋值形式；</p>
+	<script>
+		//数组的解构
+		const ANIMALS=["dog","cat","pig","duck"];
+		let [dog,cat,pig,duck]=ANIMALS;
+		console.log(dog,cat,pig,duck);
+		//对象的解构
+		const person={
+			name:"mane",
+			age:28,
+			loc:function(){
+				console.log("saineijiaer");
+			}
+		};
+		let {name,age,loc}=person;
+		console.log(name,age,loc);
+		loc();
+	</script>
+
+	<hr>
+	<h3>模板字符串</h3>
+	<p>模板字符串（template string）是增强版的字符串，用反引号（``）标识</p>
+	<ol>
+		<li>内容中可以直接出现换行符</li>
+		<li>可以使用 ${xxx} 形式引用变量；拼接字符串。</li>
+	</ol>
+	<p>当遇到字符串与变量拼接的情况使用模板字符串；</p>
+	<script>
+		let str1=`使用模板字符串`;
+		console.log(str1)
+		let str2=`
+				<ul>
+					<li></li>
+					<li></li>
+				</ul>
+		`;
+		console.log(str2);
+		let str3="mane";
+		let outstr3=`他的名字是${str3}.`;
+		console.log(outstr3);
+	</script>
+
+	<hr>
+	<h3>简化对象和函数写法</h3>
+	<p>ES6 允许在大括号里面，直接写入变量和函数，作为对象的属性和方法。这样的书写更加简洁；</p>
+	<script type="text/javascript">
+		let city="wuhan";
+		let weather=function(){
+			console.log("it is very hot");
+		};
+		const mycity={
+			city,
+			weather,
+			//声明方法的简化
+			mytime(){
+				console.log("1 month");
+			}
+		};
+		console.log(mycity.city);
+		mycity.weather();
+		mycity.mytime();
+	</script>
+
+	<hr>
+	<div id=jf>
+		<h3>箭头函数</h3>
+		<p>ES6允许使用箭头（=>）定义函数，箭头函数提供了一种更加简洁的函数书写方式，箭头函数多用于匿名函数的定义；</p>
+		<ol>
+			<li>不能使用 arguments；</li>
+			<li>箭头函数不能作为构造函数实例化；</li>
+			<li>如果形参只有一个，则小括号可以省略；</li>
+			<li>箭头函数 this 指向声明时所在作用域下 this 的值；this是静态的</li>
+			<li>函数体如果只有一条语句，则花括号可以省略，函数的返回值为该条语句的执行结果；即return语句也省略。</li>
+		</ol>
+		<p>箭头函数不会更改 this 指向，用来指定回调函数会非常合适；</p>
+		<p>箭头函数适合与 this 无关的回调. 定时器, 数组的方法回调</p>
+		<p>箭头函数不适合与 this 有关的回调. 事件回调, 对象的方法</p>
+		</div>
+	<script>
+		//声明箭头函数
+		let fn=(a,b)=>{
+			return a+b;
+		}
+		//调用
+		let result1=fn(66,26);
+		console.log("result1=",result1)
+
+		//没有参数时
+		let speak=()=>console.log("没有参数");
+		speak();
+		//一个参数时
+		let hi=name=>"hello "+name;
+		console.log(hi("senbin"));
+
+		//多个参数
+		let count3=(a,b,c)=>a+b+c;
+		console.log(count3(3,6,9));
+		const school1={
+			name:"uestc",
+		}
+		window.name="window";
+		//this始终指向函数声明时所在作用域下的this的值
+		getName=()=>console.log("getName:"+this.name);
+		getName();  //getName:window
+		getName.call(school1);  //getName:window
+
+		let jf1=document.getElementById("jf");
+		//绑定事件
+		/*
+		jf1.addEventListener("click",function(){
+			let _this=this;
+			//定时器
+			setTimeout(function(){
+				_this.style.background="#9bfd18";
+			},2000)
+		});
+		*/
+		jf1.addEventListener("click",function(){
+			//定时器
+			//使用箭头函数
+			setTimeout(()=>{
+				this.style.background="#900d18";
+			},2000)
+		});
+
+		const arr2=[10,22,27,15,5,66];
+		//从数组中返回偶数
+		const result2=arr2.filter(item=>item % 2 === 0);
+		console.log(result2);
+	</script>
+
+	<hr>
+	<h3>ES6中函数参数的默认值</h3>
+	<p>ES允许给函数的参数赋初始值；</p>
+	<p> 形参初始值 具有默认值的参数, 一般位置要靠后(潜规则)</p>
+	<p>可与解构赋值结合</p>
+	<script>
+		//有初始值的形参一般放在后面
+		function add3(a,b,c=66){
+			return a+b+c;
+		}
+		let result3=add3(10,20,22);
+		console.log(result3);
+		console.log(add3(2,1));
+		//与解构赋值结合
+		function connect({host="127.0.0.1",username,passward,port}){
+			console.log(host,username,passward,port);
+		}
+		connect({
+			host:"guolab",
+			username:"root",
+			passward:"123",
+			port:88
+		});
+
+	</script>
+
+	<hr>
+	<h3>rest参数</h3>
+	<p>ES6 引入 rest 参数，用于获取函数的实参，用来代替 arguments</p>
+	<p>ES6的rest参数...args，rest参数必须放在最后面</p>
+	<script>
+		//ES5获取实参的方式
+		function es5arg(){
+			console.log(arguments); //输出的是对象
+		}
+		es5arg("mane","shari","salah");  //["mane", "shari", "salah"]
+
+		//ES6的rest参数
+		function es6arg(...args){
+			console.log(args);//输出的是数组
+		}
+		es6arg("mane","shari","salah");
+		function es6arg2(a,b,...args){
+			console.log(a);
+			console.log(b);
+			console.log(args); //[3, 4, 5, 6, 6]
+		}
+		es6arg2(1,2,3,4,5,6,6);
+	</script>
+
+	<hr>
+	<h3>扩展运算符</h3>
+	<p>... 扩展运算符能将数组转换为逗号分隔的参数序列</p>
+	<p>扩展运算符（spread）也是三个点（...）。它好比 rest 参数的逆运算，将一个数组转为用逗号分隔的参数序列，对数组进行解包；</p>
+	<p>可应用于数组合并、数组克隆、将伪数组转为真正的数组</p>
+	<script>
+		const sports=["bask","ball","soccer","bom"];
+		function getSports(){
+			console.log(arguments);
+		}
+		getSports(...sports);
+
+		
+		const arr3=["K","O"];
+		const arr4=["P","6","6"];
+		//数组合并
+		const arr5=[...arr3,...arr4];
+		console.log(arr5);
+		//数组克隆
+		const arr6=[...arr5];
+		console.log(arr6);
+
+		//将伪数组转为真正的数组
+		const h3s=document.querySelectorAll("h3");
+		const h3arr=[...h3s];
+		console.log(h3arr);
+	</script>
+
+	<hr>
+	<h3>Symbol</h3>
+	<p>S6 引入了一种新的原始数据类型 Symbol，表示独一无二的值。它是JavaScript 语言的第七种数据类型，是一种类似于字符串的数据类型；</p>
+	<ol>
+		<li>Symbol 的值是唯一的，用来解决命名冲突的问题；</li>
+		<li>Symbol 值不能与其他数据进行运算；</li>
+		<li> Symbol 定义的对象属性不能使用for…in循环遍历 ，但是可以使用Reflect.ownKeys 来获取对象的所有键名；</li>
+	</ol>
+	<p>除了定义自己使用的 Symbol 值以外，ES6 还提供了 11 个内置的 Symbol 值，指向语言内部使用的方法。可以称这些方法为魔术方法，因为它们会在特定的场景下自动执行；</p>
+	<script>
+		//创建Symbol
+		let sb1=Symbol();
+		console.log(sb1,typeof sb1); //Symbol() "symbol"
+		let sb2=Symbol("senbin");
+		let sb3=Symbol("senbin");
+		console.log(sb2,sb3,sb2===sb3);  //Symbol(senbin) Symbol(senbin) false
+
+		//Symbol for创建
+		let sb4=Symbol.for("senbin");
+		let sb5=Symbol.for("senbin");
+		console.log(sb3,sb5,sb3===sb5);  //Symbol(senbin) Symbol(senbin) false
+		console.log(sb4,sb5,sb4===sb5);  //Symbol(senbin) Symbol(senbin) true
+
+		//Symbol创建对象属性
+		//方式一
+		let game={
+			name:"efootball",
+			up:function(){},
+			down:function(){}
+		};
+		let methods={
+			up:Symbol(),
+			down:Symbol()
+		};
+		game[methods.up]=function(){
+			console.log("up dirction");
+		}
+		game[methods.down]=function(){
+			console.log("down dirction");
+		}
+		console.log(game);  //name: "efootball", up: ƒ, down: ƒ, Symbol(): ƒ, Symbol(): ƒ
+
+		//方式二
+		let game2={
+			name:"livefootball",
+			[Symbol("goal")]:function(){
+				console.log("get a goal");
+			},
+			[Symbol("pass")]:function(){
+				console.log("pass the ball");
+			}
+		}
+		console.log(game2);
+		//调用方法
+		game[methods.up]();
+		//game2.goal();
+
+		//
+	</script>
+	<h4>内置Symbol的值</h4>
+		<ul>
+			<li>Symbol.hasInstance  当其他对象使用 instanceof 运算符，判断是否为该对象的实例时，会调用这个方法</li>
+			<li>Symbol.isConcatSpreadable  对象的 Symbol.isConcatSpreadable 属性等于的是一个布尔值，表示该对象用于Array.prototype.concat()时，是否可以展开。</li>
+			<li>Symbol.species  创建衍生对象时，会使用该属性</li>
+			<li>Symbol.match  当执行 str.match(myObject) 时，如果该属性存在，会调用它，返回该方法的返回值。</li>
+			<li>Symbol.replace  当该对象被 str.replace(myObject)方法调用时，会返回该方法的返回值。</li>
+			<li>Symbol.search  当该对象被 str. search (myObject)方法调用时，会返回该方法的返回值。</li>
+			<li>Symbol.split  当该对象被 str. split (myObject)方法调用时，会返回该方法的返回值。</li>
+			<li>Symbol.iterator  对象进行 for…of 循环时，会调用 Symbol.iterator 方法，返回该对象的默认遍历器</li>
+			<li>Symbol.toPrimitive  该对象被转为原始类型的值时，会调用这个方法，返回该对象对应的原始类型值。</li>
+			<li>Symbol. toStringTag  在该对象上面调用 toString 方法时，返回该方法的返回值</li>
+			<li>Symbol. unscopables  该对象指定了使用 with 关键字时，哪些属性会被 with环境排除。</li>
+		</ul>
+	<p> Symbol内置值的使用，都是作为某个对象类型的属性去使用；</p>
+
+	<hr>
+	<h3>迭代器</h3>
+	<p>遍历器（Iterator）就是一种机制。它是一种接口，为各种不同的数据结构提供统一的访问机制。任何数据结构只要部署 Iterator 接口，就可以完成遍历操作；</p>
+	<p>ES6 创造了一种新的遍历命令 for...of 循环，Iterator 接口主要供 for...of 消费；</p>
+	<p>原生具备 iterator 接口的数据(可用 for of 遍历)：</p>
+	<ul>
+		<li>Array</li>
+		<li>Arguments</li>
+		<li>Set</li>
+		<li>Map</li>
+		<li>String</li>
+		<li>TypedArray</li>
+		<li>NodeList</li>
+	</ul>
+	<p>工作原理：</p>
+	<ol>
+		<li>创建一个指针对象，指向当前数据结构的起始位置；</li>
+		<li>第一次调用对象的 next 方法，指针自动指向数据结构的第一个成员；</li>
+		<li>接下来不断调用 next 方法，指针一直往后移动，直到指向最后一个成员；</li>
+		<li>每调用 next 方法返回一个包含 value 和 done 属性的对象；</li>
+	</ol>
+	<p>重新初始化对象，指针也会重新回到最前面</p>
+	<p>需要自定义遍历数据的时候，要想到迭代器</p>
+
+	<script>
+		const arr7=["apple","orange","banana"];
+		for (let f of arr7){
+			console.log(f);
+		}
+		let iterator=arr7[Symbol.iterator]();
+		console.log(iterator.next());  //{value: "apple", done: false}
+		console.log(iterator.next());  //{value: "orange", done: false}
+		console.log(iterator.next());  //{value: "banana", done: false}
+		console.log(iterator.next());  //{value: undefined, done: true}
+	</script>
+	<script>
+		//迭代器自定义遍历对象
+		const club={
+			name:"liverpool",
+			members:[
+				"mane",
+				"Arnold",
+				"Robson",
+				"Sadio"
+			],
+			[Symbol.iterator](){
+				let index=0;
+				let _this=this;
+				return{
+					next:function(){
+						if (index<_this.members.length){
+							const result3={
+								value:_this.members[index],
+								done:false
+							};
+							index++;
+							return result3;
+						}else{
+							return{
+								value:undefined,
+								done:true
+							};
+						}
+					}
+				};
+			}
+		}
+		//遍历
+		for (let m of club){
+			console.log(m);
+		}
+	</script>
+
+	<hr>
+	<h3>生成器</h3>
+	<p>生成器函数是 ES6 提供的一种异步编程解决方案，语法行为与传统函数完全不同；</p>
+	<p>生成器其实就是一个特殊的函数</p>
+	<p>异步编程 纯回调函数 node fs ajax mongodb</p>
+
+	<script>
+		//生成器函数
+		//yield：函数代码的分隔符
+		function* gen(){
+			console.log(111);
+			yield "aaa";
+			console.log(222);
+			yield "bbb";
+			console.log(333);
+			yield "ccc";
+			console.log(444);
+		}
+		let iterator2=gen();
+		console.log(iterator2.next());
+		console.log(iterator2.next());
+		console.log(iterator2.next());
+		console.log(iterator2.next());
+		//遍历
+		for(let v of gen()){
+			console.log(v);
+		}
+
+		//生成器函数的参数传递
+		function* gen2(arg){
+			console.log(arg);
+			let one=yield 111;
+			console.log(one);
+			let two=yield 222;
+			console.log(two);
+			let three=yield 333;
+		}
+		let iterator3=gen2("aaa");
+		//next()方法是可以传入参数的，传入的参数作为第一条(上一条)语句yield 111的返回结果
+		console.log(iterator3.next());   // {value: 111, done: false}
+		console.log(iterator3.next("bbb"));   // 会执行yield 222;
+		console.log(iterator3.next("ccc"));   // 会执行yield 333;
+		console.log(iterator3.next("ddd"));   // 继续往后走，未定义;{value: undefined, done: true}
+	</script>
+	<script>
+		//需求：1s后控制台输出1s 再过2s后控制台输出2s 再过3s后控制台输出3s
+		//方式一  回调地狱
+		/*
+		setTimeout(()=>{
+			console.log("1s");
+			setTimeout(()=>{
+				console.log("2s");
+				setTimeout(()=>{
+					console.log("3s");
+				},3000)
+			},2000)
+		},1000);
+		*/
+		/*
+		//方式二  生成器函数
+		function one(){
+			setTimeout(()=>{
+				console.log("1s");
+				iterator4.next();
+			},1000)
+		}
+		function two(){
+			setTimeout(()=>{
+				console.log("2s");
+				iterator4.next();
+			},1000)
+		}
+		function three(){
+			setTimeout(()=>{
+				console.log("3s");
+				iterator4.next();
+			},1000)
+		}
+
+		function *gen3(){
+			yield one();
+			yield two();
+			yield three();
+		}
+		//调用生成器函数
+		let iterator4=gen3();
+		iterator4.next();
+		*/
+	</script>
+	<script>
+		//模拟获取: 用户数据 订单数据 商品数据
+		function getUsers(){
+			setTimeout(()=>{
+				let data="用户数据";
+				//第二次调用next，传入参数，作为第一个的返回值
+				iterator5.next(data);
+			},1000)
+		}
+		function getorders(){
+			setTimeout(()=>{
+				let data="订单数据";
+				iterator5.next(data);
+			},1000)
+		}
+		function getGoods(){
+			setTimeout(()=>{
+				let data="货物数据";
+				iterator5.next(data);
+			},1000)
+		}
+		/*
+		function *gen5(){
+			let users=yield getUsers();
+			console.log(users);
+			let orders=yield getorders();
+			console.log(orders);
+			let goods=yield getGoods();
+			console.log(goods);
+		}
+		//
+		let iterator5=gen5();
+		iterator5.next();
+		*/
+	</script>
+
+	<hr>
+	<h3>Promise</h3>
+	<p>Promise 是 ES6 引入的异步编程的新解决方案。语法上 Promise 是一个构造函数，用来封装异步操作并可以获取其成功或失败的结果；</p>
+	<ul>
+		<li>Promise 构造函数: Promise (excutor) {}；</li>
+		<li>Promise.prototype.then 方法；</li>
+		<li>Promise.prototype.catch 方法；</li>
+	</ul>
+	<script>
+		//实例化Promise对象
+		//Promise 对象三种状态：初始化、成功、失败
+		/*
+		const p=new Promise(function(resolve,reject){
+			setTimeout(function(){
+				let data="The data of user in database";
+				//resolve
+				resolve(data)
+				let err="read data happen error";
+				reject(err);
+			},1000);
+		});
+		//调用Promise对象的then方法
+		p.then(function(value){
+			//成功
+			console.log(value);
+		},function(reason){
+			//失败
+			console.error(reason);
+		});
+		p.catch(reason=>{
+			console.warn(reason);
+		});
+		*/
+	</script>
+
+	<hr>
+	<h3>Set集合</h3>
+	<p>ES6 提供了新的数据结构 Set（集合）。它类似于数组，但成员的值都是唯一的，集合实现了 iterator接口，所以可以使用『扩展运算符』和『for…of…』进行遍历，集合的属性和方法：</p>
+	<ol>
+		<li> size 返回集合的元素个数；</li>
+		<li> add 增加一个新元素，返回当前集合；</li>
+		<li> delete 删除元素，返回 boolean 值；</li>
+		<li> has 检测集合中是否包含某个元素，返回 boolean 值；</li>
+		<li> clear 清空集合，返回 undefined；</li>
+	</ol>
+	<script>
+		//Set集合
+		let s=new Set();
+		console.log(s,typeof s);
+
+		let s1=new Set(["A","B","C","D","C","A"]);
+		console.log(s1);  //会自动去重
+		console.log(s1.size);//返回集合元素个数
+		s1.add("F");  //添加一个元素到集合
+		console.log(s1);
+		let dc=s1.delete("C")  //删除元素
+		console.log(s1)
+		let hasE=s1.has("E");  //检测是否包含某元素
+		console.log(hasE);
+		console.log(s1);
+		s1.clear();  //清空集合
+		console.log(s1);
+
+		let arr8=[1,2,3,4,2,5,7,8,5,2,3];
+		//数组去重
+		let s2=new Set(arr8);
+		//交集
+		let arr9=[3,4,2,6,10,23];
+		let jj9=[...new Set(arr8)].filter(item=>new Set(arr9).has(item));
+		console.log("交集:",jj9);
+
+		//并集
+		let union9=[...new Set([...arr8,...arr9])];
+		console.log("并集:",union9);
+
+		//差集
+		let cj9=[...new Set(arr8)].filter(item=>!(new Set(arr9).has(item)));
+		console.log("差集:",cj9);
+
+	</script>
+
+	<hr>
+	<h3>Map集合</h3>
+	<p>ES6 提供了 Map 数据结构。它类似于对象，也是键值对的集合。但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。Map 也实现了iterator 接口，所以可以使用『扩展运算符』和『for…of…』进行遍历；</p>
+	<p>Map 的属性和方法：</p>
+	<ol>
+		<li> size 返回 Map 的元素个数；</li>
+		<li>set 增加一个新元素，返回当前 Map；</li>
+		<li>get 返回键名对象的键值；</li>
+		<li>as 检测 Map 中是否包含某个元素，返回 boolean 值；</li>
+		<li>clear 清空集合，返回 undefined；</li>
+	</ol>
+	<script>
+		//创建Map集合
+		let m0=new Map();
+		console.log(m0);
+
+		let m1=new Map([["name","mane"],["age",28]]);
+		console.log(m1);  //Map(2) {"name" => "mane", "age" => 28}
+		console.log(m1.size);  //Map元素个数
+		//增加Map元素
+		m1.set("number",10);
+		m1.set("local","former");
+		console.log(m1);
+		console.log(m1.get("number"));  //返回键值
+		console.log(m1.has("local"));  //检测是否有某个元素
+		m1.clear();  //清空Map集合
+		console.log(m1);
+	</script>
+
+	<hr>
+	<h3>class类</h3>
+	<p>ES6 提供了更接近传统语言的写法，引入了 Class（类）这个概念，作为对象的模板。通过 class 关键字，可以定义类。基本上，ES6 的 class 可以看作只是一个语法糖，它的绝大部分功能，ES5 都可以做到，新的 class 写法只是让对象原型的写法更加清晰、更像面向对象编程的语法而已；</p>
+	<ol>
+		<li> class 声明类；</li>
+		<li> constructor 定义构造函数初始化；</li>
+		<li> extends 继承父类；</li>
+		<li> super 调用父级构造方法；</li>
+		<li> static 定义静态方法和属性；</li>
+		<li> 父类方法可以重写；</li>
+	</ol>
+	<script>
+		/*
+		//ES5实现class
+		function Phone(brand,price){
+			this.brand=brand;
+			this.price=price;
+		}
+		//添加方法
+		Phone.prototype.call=function(){
+			console.log("call to somebody");
+		}
+		//实例化对象
+		let huawei=new Phone("华为",1000);
+		huawei.call();
+		console.log(huawei);
+		*/
+		/*
+		//ES6实现
+		class Phone{
+			//构造方法，名字是固定的
+			constructor(brand,price){
+				this.brand=brand;
+				this.price=price;
+			}
+			//call方法，必需这样写
+			call(){
+				console.log("call to somebody");
+			}
+		}
+		let huawei=new Phone("华为",2999);
+		huawei.call();
+		console.log(huawei);
+		*/
+
+		//class静态成员
+		/*
+		//ES5写法
+		function Phone(){}
+		Phone.name="mobile phone";
+		Phone.change=function(){
+			console.log("can change color");
+		}
+		let oppo=new Phone();
+		//console.log(oppo.name);  //undefined
+		//oppo.change();  //报错
+		Phone.prototype.color="yellow";
+		console.log(oppo.color);  //yellow
+		console.log(Phone.name);  //Phone
+		//实例对象和函数对象的属性是不相通的
+		Phone.change();  //can change color
+		*/
+		/*
+		//ES6写法
+		class Phone{
+			//静态属性
+			static name="mobile phone";
+			static change(){
+				console.log("change something");
+			}
+		}
+		let vivo=new Phone();
+		console.log(vivo.name);  //undefined
+		console.log(Phone.name); //mobile phone
+		Phone.change();
+		*/
+
+		/*
+		//ES5构造函数实现继承
+		function Phone(brand,price){
+			this.brand=brand;
+			this.price=price;
+		}
+		//添加方法
+		Phone.prototype.call=function(){
+			console.log("call to somebody");
+		}
+		//
+		function smartPhone(brand,price,color,size){
+			Phone.call(this,brand,price);
+			this.color=color;
+			this.size=size;
+		}
+		//设置子级构造函数的原型
+		smartPhone.prototype=new Phone;
+		smartPhone.prototype.constructor=smartPhone;
+		//声明子类的方法
+		smartPhone.prototype.photo=function(){
+			console.log("take picture");
+		}
+		smartPhone.prototype.game=function(){
+			console.log("play games");
+		}
+		const oppo=new smartPhone("oppo",3299,"black","5 inc");
+		console.log(oppo);
+		oppo.call();
+		oppo.photo();
+		oppo.game();
+		*/
+
+		//ES6 class实现类继承
+		class Phone{
+			//构造方法，名字是固定的
+			constructor(brand,price){
+				this.brand=brand;
+				this.price=price;
+			}
+			//call方法，必需这样写
+			call(){
+				console.log("call to somebody");
+			}
+			get price(){
+				console.log("get price");
+				return 1000;
+			}
+			set price(v){
+				console.log("update price");
+				console.log(v);
+			}
+		}
+		class smartPhone extends Phone{
+			//构造函数
+			constructor(brand,price,color,size){
+				super(brand,price);  // 调用父类构造函数
+				this.color=color;
+				this.size=size;
+			}
+			//子类对父类方法重写,直接写，直接覆盖
+			//注意：子类无法调用父类同名方法
+			call(){
+				console.log("can call use vedio");
+			}
+			photo(){
+				console.log("take picture");
+			}
+			game(){
+				console.log("play games");
+			}
+		}
+		const oppo=new smartPhone("oppo",3299,"black","5 inc");
+		console.log(oppo);
+		oppo.call();
+		oppo.photo();
+		oppo.game();
+		console.log(oppo.price)
+		oppo.price=2867;
+
+	</script>
+
+	<hr>
+	<h3>数值扩展</h3>
+	<h4>Number.EPSILON</h4>
+	<p>Number.EPSILON 是 JavaScript 表示的最小精度；EPSILON 属性的值接近于 2.2204460492503130808472633361816E-16；</p>
+	<h4>二进制和八进制</h4>
+	<p>ES6 提供了二进制和八进制数值的新的写法，分别用前缀 0b 和 0o 表示；</p>
+	<h4>Number.isFinite() 与 Number.isNaN()</h4>
+	<p>Number.isFinite() 用来检查一个数值是否为有限的；</p>
+	<p>Number.isNaN() 用来检查一个值是否为 NaN；</p>
+	<h4>Number.parseInt() 与 Number.parseFloat()</h4>
+	<p>ES6 将全局方法 parseInt字符串转整数 和 parseFloat字符串转整数，移植到 Number 对象上面，使用不变；</p>
+	<h4>Math.trunc</h4>
+	<p>用于去除一个数的小数部分，返回整数部分；</p>
+	<h4>Number.isInteger</h4>
+	<p>Number.isInteger() 用来判断一个数值是否为整数；</p>
+	<h4>Math.sign</h4>
+	<p>判断一个数到底为正数 负数 还是零</p>
+
+	<script>
+		function equal2(a,b){
+			if (Math.abs(a-b)<Number.EPSILON){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		console.log(0.1+0.2===0.3);  //false
+		console.log(equal2(0.1+0.2,0.3));  //true
+
+		let b2=0b10001;
+		let o8=0o762;
+		let d10=100;
+		let x16=0xfdb;
+		console.log(b2,o8,d10,x16);  //17 498 100 4059
+
+		console.log(Number.isFinite(100));  //true
+		console.log(Number.isFinite(100/0));  //false
+		console.log(Number.isFinite(Infinity));  //false
+
+		console.log(Number.isNaN(218));  //false
+
+		console.log(Number.parseInt("434599dss"));  //434599
+		console.log(Number.parseInt("4345.99dss"));  //4345
+
+		console.log(Number.isInteger("43459"));  //false
+		console.log(Number.isInteger(43459.19));  //false
+
+		console.log(Math.trunc(4324.323));  //4324
+
+		console.log(Math.sign(12));  //1
+		console.log(Math.sign(0));  //0
+		console.log(Math.sign(-87));  //-1
+	</script>
+
+	<hr>
+	<h3>对象扩展</h3>
+	<p>1. Object.is 比较两个值是否严格相等，与『===』行为基本一致（+0 与 NaN）；NaN与任何数值做===比较都是false，跟他自己也如此！</p>
+	<p>2. Object.assign 对象的合并，将源对象的所有可枚举属性，复制到目标对象；如果前边有后边没有会添加，如果前后都有，后面的会覆盖前面的</p>
+	<p>3. proto、setPrototypeOf、 setPrototypeOf 可以直接设置对象的原型</p>
+	<script>
+		console.log(Object.is(120,120));  //等同于===  true
+		console.log(Object.is(NaN,NaN));  //true
+		console.log(NaN===NaN);  //false
+
+		//对象合并
+		const config1={
+			host:"localhost",
+			port:8080,
+			name:"root",
+			pass:"123",
+			test:"test1"
+		}
+		const config2={
+			host:"http",
+			port:80,
+			name:"root22",
+			pass:"12322",
+			test2:"test2"
+		}
+		//如果前边有后边没有会添加，如果前后都有，后面的会覆盖前面的
+		console.log(Object.assign(config1,config2)); 
+		//host: "http", port: 80, name: "root22", pass: "12322", test: "test1",test2: "test2"
+
+		// __proto__、setPrototypeOf、 getPrototypeOf 可以直接设置对象的原型
+		const school3={
+			name:"noschool"
+		}
+		const city3={
+			areas:['beijng','shanghai','chengdu']
+		}
+		//并不建议这么做
+		Object.setPrototypeOf(school3,city3);
+		console.log(Object.getPrototypeOf(school3));  //areas: (3) ["beijng", "shanghai", "chengdu"] __proto__: Object
+		console.log(school3);  //{name: "noschool"}
+
+	</script>
+
+	<hr>
+	<h3>模块化</h3>
+	<p>模块化是指将一个大的程序文件，拆分成许多小的文件，然后将小文件组合起来；</p>
+	<p>模块化的好处：1. 防止命名冲突；2. 代码复用；3. 高维护性；</p>
+	<p>模块功能主要由两个命令构成：export 和 import；</p>
+	<ul>
+		<li>export 命令用于规定模块的对外接口（导出模块）；</li>
+		<li>import 命令用于输入其他模块提供的功能（导入模块）；</li>
+	</ul>
+	<script type="module">
+		//引入m1.js模块的内容
+		/*
+		import * as m1 from "./m1.js";
+		console.log(m1);
+		console.log(m1.school4);
+		m1.teach();
+		*/
+	</script>
+
+	<hr>
+	<h3>Babel对ES6模块化代码转换</h3>
+	<p>Babel 是一个 JavaScript 编译器；<br>
+		Babel 能够将新的ES规范语法转换成ES5的语法；<br>
+		因为不是所有的浏览器都支持最新的ES规范，所以，一般项目中都需要使用Babel进行转换；<br>
+		步骤：使用Babel转换JS代码——打包成一个文件——使用时引入即可；
+	</p>
+
+	<hr>
+	<h3>ES6模块化引入NPM包</h3>
+
+
+
+
+
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>
