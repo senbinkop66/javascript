@@ -1,1 +1,1 @@
-# javascropt
+# javascript
