@@ -1,0 +1,1020 @@
+// 使用嵌套数组初始化映射
+const m1 = new Map([
+    ["key1", "val1"],
+    ["key2", "val2"],
+    ["key3", "val3"]
+]);
+console.log(m1.size); // 3
+
+// 使用自定义迭代器初始化映射
+let m2=new Map({
+    [Symbol.iterator]:function*(){
+        yield ["key1","val1"];
+        yield ["key2","val2"];
+        yield ["key3","val3"];
+    }
+});
+console.log(m2.size); // 3
+
+// 映射期待的键/值对，无论是否提供
+let m3=new Map([[]]);
+console.log(m3.has(undefined));  //true
+console.log(m3.get(undefined));  //undefined
+
+let m=new Map();
+console.log(m.has("firstName"));  //false
+console.log(m.get("firstName"));  //undefined
+console.log(m.size);  //0
+
+m.set("firstName","sadio").set("lastName","mane");
+console.log(m.has("firstName"));  //true
+console.log(m.get("firstName"));  //sadio
+console.log(m.size);  //2
+
+m.delete("firstName");  //只删除这一个键/值对
+console.log(m.has("firstName")); // false
+console.log(m.has("lastName")); // true
+console.log(m.size); // 1
+
+m.clear();  //清除这个映射实例中的所有键/值对
+console.log(m.has("firstName")); // false
+console.log(m.has("lastName")); // false
+console.log(m.size); // 0
+
+let m=new Map();
+
+let functionKey=function(){};
+let symbolKey=Symbol();
+let objectKey=new Object();
+
+m.set(functionKey,"functionValue");
+m.set(symbolKey,"symbolValue");
+m.set(objectKey,"objectValue")
+
+
+console.log(m.size); // 3
+console.log(m.get(functionKey));  //functionValue
+console.log(m.get(symbolKey));  //symbolValue
+console.log(m.get(objectKey));  //objectValue
+
+// SameValueZero 比较意味着独立实例不冲突
+console.log(m.get(function(){}));  //undefined
+
+let m=new Map();
+
+const objKey = {},
+objVal = {},
+arrKey = [],
+arrVal = [];
+
+m.set(objKey, objVal);
+m.set(arrKey, arrVal);
+
+objKey.foo = "foo";
+objVal.bar = "bar";
+
+arrKey.push("foo");
+arrVal.push("bar");
+
+console.log(m.get(objKey)); // {bar: "bar"}
+console.log(m.get(arrKey)); // ["bar"]
+
+let m=new Map();
+
+const a = 0/"", // NaN
+b = 0/"", // NaN
+pz = +0,
+nz = -0;
+
+console.log(a === b); // false
+console.log(pz === nz); // true
+m.set(a, "foo");
+m.set(pz, "bar");
+console.log(m.get(b)); // foo
+console.log(m.get(nz)); // bar
+
+console.log([...m]);
+//[ [ 'key1', 'val1' ], [ 'key2', 'val2' ], [ 'key3', 'val3' ] ]
+
+console.log(m.entries===m[Symbol.iterator]); // true
+
+for (let pair of m.entries()){
+    console.log(pair);
+}
+//一样效果
+for (let pair of m[Symbol.iterator]()){
+    console.log(pair);
+}
+/*
+[ 'key1', 'val1' ]
+[ 'key2', 'val2' ]
+[ 'key3', 'val3' ]
+*/
+
+console.log([...m]);
+//[ [ 'key1', 'val1' ], [ 'key2', 'val2' ], [ 'key3', 'val3' ] ]
+
+for (let key of m.keys()){
+    console.log(key);
+}
+for (let val of m.values()){
+    console.log(val);
+}
+
+m.forEach((val,key)=>console.log(`${key}->${val}`));
+// key1 -> val1
+// key2 -> val2
+// key3 -> val3
+
+const m1 = new Map([
+    ["key1", "val1"]
+]);
+// 作为键的字符串原始值是不能修改的
+for (let key of m1.keys()) {
+    key = "newKey";
+    console.log(key); // newKey
+    console.log(m1.get("key1")); // val1
+}
+const keyObj = {id: 1};
+const m = new Map([
+    [keyObj, "val1"]
+]);
+// 修改了作为键的对象的属性，但对象在映射内部仍然引用相同的值
+for (let key of m.keys()) {
+    key.id = "newKey";
+    console.log(key); // {id: "newKey"}
+    console.log(m.get(keyObj)); // val1
+}
+console.log(keyObj); // {id: "newKey"}
+
+const key1 = {id: 1},
+    key2 = {id: 2},
+    key3 = {id: 3};
+// 使用嵌套数组初始化弱映射
+const wm1 = new WeakMap([
+    [key1, "val1"],
+    [key2, "val2"],
+    [key3, "val3"]
+]);
+console.log(wm1.get(key1)); // val1
+console.log(wm1.get(key2)); // val2
+console.log(wm1.get(key3)); // val3
+
+const key1 = {id: 1},
+    key2 = {id: 2},
+    key3 = {id: 3};
+// 使用嵌套数组初始化弱映射
+const wm1 = new WeakMap([
+    [key1, "val1"],
+    [key2, "val2"],
+    [key3, "val3"]
+]);
+console.log(wm1.get(key1)); // val1
+console.log(wm1.get(key2)); // val2
+console.log(wm1.get(key3)); // val3
+
+// 原始值可以先包装成对象再用作键
+let stringKey=new String("key1");
+let vm3=new WeakMap([
+    [key1, "val1"],
+    [stringKey, "val2"],
+    [key3, "val3"]
+    ]);
+console.log(vm3.get(stringKey));  //val2
+
+// 初始化是全有或全无的操作
+// 只要有一个键无效就会抛出错误，导致整个初始化失败
+let vm2=new WeakMap([
+    [key1,"val1"],
+    ["badkey","val2"],
+    [key3,"val3"]  //TypeError: Invalid value used as weak map key
+    ]);
+
+let wm=new WeakMap();
+
+let key1={id:1},key2={id:2};
+
+console.log(wm.has(key1));  //false
+console.log(wm.get(key1));  //undefined
+
+wm.set(key1,"Arnold").set(key2,"mane");
+
+console.log(wm.has(key1)); // true
+console.log(wm.get(key1)); // Arnold
+
+wm.delete(key1); // 只删除这一个键/值对
+console.log(wm.has(key1)); // false
+console.log(wm.has(key2)); // true
+
+const wm = new WeakMap();
+const container = {
+    key: {}
+};
+
+wm.set(container.key, "val");
+
+function removeReference() {
+    container.key = null;
+}
+
+const wm = new WeakMap();
+
+class User{
+    constructor(id){
+        this.idProperty=Symbol('id');
+        this.setId(id);
+    }
+    setPrivate(property,value){
+        let privateMembers=wm.get(this) || {};
+        privateMembers[property]=value;
+        wm.set(this,privateMembers);
+    }
+    getPrivate(property){
+        return wm.get(this)[property];
+    }
+    setId(id){
+        this.setPrivate(this.idProperty,id);
+    }
+    getId(){
+        return this.getPrivate(this.idProperty);
+    }
+}
+
+let user=new User(123);
+console.log(user.getId());  //123
+user.setId(456);
+console.log(user.getId());  //456
+
+// 并不是真正私有的
+console.log(wm.get(user)[user.idProperty]);  //456
+
+const User=(()=>{
+    const wm = new WeakMap();
+
+    class User{
+        constructor(id){
+            this.idProperty=Symbol('id');
+            this.setId(id);
+        }
+        setPrivate(property,value){
+            let privateMembers=wm.get(this) || {};
+            privateMembers[property]=value;
+            wm.set(this,privateMembers);
+        }
+        getPrivate(property){
+            return wm.get(this)[property];
+        }
+        setId(id){
+            this.setPrivate(this.idProperty,id);
+        }
+        getId(){
+            return this.getPrivate(this.idProperty);
+        }
+    }
+
+    return User;
+})();
+    
+
+let user=new User(123);
+console.log(user.getId());  //123
+user.setId(456);
+console.log(user.getId());  //456
+
+// 使用数组初始化集合
+const s1 = new Set(["val1", "val2", "val3"]);
+console.log(s1.size); // 3
+// 使用自定义迭代器初始化集合
+const s2 = new Set({
+    [Symbol.iterator]: function*() {
+        yield "val1";
+        yield "val2";
+        yield "val3";
+    }
+});
+console.log(s2.size); // 3
+
+const s = new Set();
+console.log(s.has("Matt")); // false
+console.log(s.size); // 0
+s.add("Matt")
+.add("Frisbie");
+console.log(s.has("Matt")); // true
+console.log(s.size); // 2
+s.delete("Matt");
+console.log(s.has("Matt")); // false
+console.log(s.has("Frisbie")); // true
+console.log(s.size); // 1
+s.clear(); // 销毁集合实例中的所有值
+console.log(s.has("Matt")); // false
+console.log(s.has("Frisbie")); // false
+console.log(s.size); // 0
+
+const s = new Set();
+
+const functionVal = function() {};
+const symbolVal = Symbol();
+const objectVal = new Object();
+
+s.add(functionVal);
+s.add(symbolVal);
+s.add(objectVal);
+
+console.log(s.has(functionVal)); // true
+console.log(s.has(symbolVal)); // true
+console.log(s.has(objectVal)); // true
+
+// SameValueZero 检查意味着独立的实例不会冲突
+console.log(s.has(function() {})); // false
+
+const s = new Set();
+const objVal = {},
+arrVal = [];
+s.add(objVal);
+s.add(arrVal);
+objVal.bar = "bar";
+arrVal.push("bar");
+console.log(s.has(objVal)); // true
+console.log(s.has(arrVal)); // true
+
+const s = new Set();
+s.add('foo');
+console.log(s.size); // 1
+s.add('foo');
+console.log(s.size); // 1
+// 集合里有这个值
+console.log(s.delete('foo')); // true
+// 集合里没有这个值
+console.log(s.delete('foo')); // false
+
+
+class Xset extends Set{
+    union(...sets){
+        return Xset.union(this,...sets);
+    }
+    intersection(...sets){
+        return Xset.intersection(this,...sets);
+    }
+    difference(set){
+        return Xset.difference(this,set);
+    }
+    symmetricDifference(set){
+        return Xset.symmetricDifference(this,set);
+    }
+    cartesianProduct(set){
+        return Xset.cartesianProduct(this,set);
+    }
+    powerSet(){
+        return Xset.powerSet(this);
+    }
+    //返回两个或更多集合的并集
+    static union(a,...bSets){
+        let unionSet=new Xset(a);
+        for (let b of bSets){
+            for (let bValue of b){
+                unionSet.add(bValue);
+            }
+        }
+        return unionSet;
+    }
+    // 返回两个或更多集合的交集
+    static intersection(a,...bSets){
+        let intersectionSet=new Xset(a);
+        for (let aValues of intersectionSet){
+            for (let b of bSets){
+                if (!b.has(aValues)){
+                    intersectionSet.delete(aValues);
+                }
+            }
+        }
+        return intersectionSet;
+    }
+    // 返回两个集合的差集
+    static difference(a,b){
+        let differenceSet=new Xset(a);
+        for (let bValue of b){
+            if (a.has(bValue)) {
+                differenceSet.delete(bValue);
+            }
+        }
+        return differenceSet;
+    }
+    // 返回两个集合的对称差集
+    static symmetricDifference(a,b){
+        // 按照定义，对称差集可以表达为
+        return a.union(b).difference(a.intersection(b));
+    }
+    // 返回两个集合（数组对形式）的笛卡儿积
+    // 必须返回数组集合，因为笛卡儿积可能包含相同值的对
+    //笛卡尔乘积是指在数学中，两个集合X和Y的笛卡尔积（Cartesian product），
+    //又称直积，表示为X × Y，第一个对象是X的成员而第二个对象是Y的所有可能有序对的其中一个成员 。
+    static cartesianProduct(a,b){
+        let cartesianProductSet=new Xset();
+        for (let aValues of a){
+            for (let bValue of b){
+                cartesianProductSet.add([aValues,bValue]);
+            }
+        }
+        return cartesianProductSet;
+    }
+    // 返回一个集合的幂集
+    //所谓幂集（Power Set）， 就是原集合中所有的子集（包括全集和空集）构成的集族。
+    static powerSet(a){
+        let powerSet=new Xset().add(new Xset());
+        for (let aValues of a){
+            for (let set of new Xset(powerSet)){
+                powerSet.add(new Xset(set).add(aValues));
+            }
+        }
+        return powerSet;
+    }
+}
+
+let a=new Xset([1,2,3]);
+let b=new Xset([2,3,4]);
+
+
+//并集
+console.log("并集");
+let result=a.union(b);
+for (let value of result.values()) {
+    console.log(value);
+}
+
+//求交集
+console.log("交集");
+result=a.intersection(b);
+for (let value of result.values()) {
+    console.log(value);
+}
+
+//两个集合的差集
+console.log("差集");
+result=a.difference(b);
+for (let value of result.values()) {
+    console.log(value);
+}
+
+//两个集合的对称差集
+console.log("对称差集");
+result=a.symmetricDifference(b);
+for (let value of result.values()) {
+    console.log(value);
+}
+
+//两个集合的笛卡儿积
+console.log("笛卡儿积");
+result=a.cartesianProduct(b);
+for (let value of result.values()) {
+    console.log(value);
+}
+
+//返回一个集合的幂集
+console.log("返回一个集合的幂集");
+result=a.powerSet();
+for (let value of result.values()) {
+    console.log(value);
+}
+
+const val1 = {id: 1},
+    val2 = {id: 2},
+    val3 = {id: 3};
+
+// 使用数组初始化弱集合
+const ws1 = new WeakSet([val1, val2, val3]);
+console.log(ws1.has(val1)); // true
+console.log(ws1.has(val2)); // true
+console.log(ws1.has(val3)); // true
+
+// 原始值可以先包装成对象再用作值
+const stringVal = new String("val1");
+const ws3 = new WeakSet([stringVal]);
+console.log(ws3.has(stringVal)); // true
+
+// 初始化是全有或全无的操作
+// 只要有一个值无效就会抛出错误，导致整个初始化失败
+const ws2 = new WeakSet([val1, "BADVAL", val3]);
+// TypeError: Invalid value used in WeakSet
+console.log(typeof ws2);
+// ReferenceError: ws2 is not defined
+
+const ws = new WeakSet();
+
+const val1 = {id: 1},val2 = {id: 2};
+
+console.log(ws.has(val1)); // false
+
+ws.add(val1).add(val2);
+console.log(ws.has(val1)); // true
+console.log(ws.has(val2)); // true
+
+ws.delete(val1); // 只删除这一个值
+console.log(ws.has(val1)); // false
+console.log(ws.has(val2)); // true
+
+function foo() {}
+let bar = function() {};
+let baz = () => {};
+
+console.log(foo.name); // foo
+console.log(bar.name); // bar
+console.log(baz.name); // baz
+console.log((() => {}).name); //（空字符串）
+console.log((new Function()).name); // anonymous
+
+function factorial(num) {
+    if (num <= 1) {
+        return 1;
+    } else {
+        return num * arguments.callee(num - 1);
+    }
+}
+
+console.log(factorial(5));
+
+let trueFactorial=factorial;
+
+factorial=function(){
+    return 0;
+}
+
+console.log(trueFactorial(5));  //120
+console.log(factorial(5));  //0
+
+function outer() {
+    inner();
+}
+function inner() {
+    console.log(inner.arguments.callee.caller);
+}
+
+outer();  //[Function: outer]
+
+function sayName(name) {
+    console.log(name);
+}
+function sum(num1, num2) {
+    return num1 + num2;
+}
+function sayHi() {
+    console.log("hi");
+}
+
+console.log(sayName.length); // 1
+console.log(sum.length); // 2
+console.log(sayHi.length); // 0
+
+const target={
+    id:"target"
+}
+
+const handler={};
+
+const proxy=new Proxy(target,handler);
+
+//id 属性会访问同一个值
+console.log(target.id);  //target
+console.log(proxy.id);  //target
+
+// 给目标属性赋值会反映在两个对象上
+// 因为两个对象访问的是同一个值
+target.id="foo";
+console.log(target.id);  //foo
+console.log(proxy.id);  //foo
+
+// 给代理属性赋值会反映在两个对象上
+// 因为这个赋值会转移到目标对象
+proxy.id="bar";
+console.log(target.id);  //bar
+console.log(proxy.id);  //bar
+
+// hasOwnProperty()方法在两个地方
+// 都会应用到目标对象
+console.log(proxy.hasOwnProperty("id"));  //true
+console.log(target.hasOwnProperty('id')); // true
+
+// 严格相等可以用来区分代理和目标
+console.log(target===proxy);  //false
+
+// Proxy.prototype 是 undefined
+// 因此不能使用 instanceof 操作符
+//console.log(target instanceof Proxy);  //TypeError: Function has non-object prototype 'undefined' in instanceof check
+//console.log(proxy instanceof Proxy);  //TypeError: Function has non-object prototype 'undefined' in instanceof check
+
+const target={
+    foo:"bar"
+}
+
+const handler={
+    // 捕获器在处理程序对象中以方法名为键
+    get(){
+        return 'handler override';
+    }
+};
+
+const proxy=new Proxy(target,handler);
+
+const target={
+    foo:"bar"
+}
+
+const handler={
+    // 捕获器在处理程序对象中以方法名为键
+    get(trapTarget,property,receiver){
+        //get()捕获器会接收到目标对象、要查询的属性和代理对象三个参数。
+        console.log(trapTarget===target);
+        console.log(property);
+        console.log(receiver===proxy);
+    }
+};
+
+const proxy=new Proxy(target,handler);
+
+proxy.foo;
+// true
+// foo
+// true
+
+
+const target={
+    foo:"bar"
+}
+
+const handler={
+    get(){
+        return Reflect.get(...arguments);
+    }
+};
+
+const proxy=new Proxy(target,handler);
+
+console.log(target.foo); // bar
+console.log(proxy.foo); // bar
+
+const target={
+    foo:"bar",
+    baz:"qux"
+}
+
+const handler={
+    // 捕获器在处理程序对象中以方法名为键
+    get(trapTarget,property,receiver){
+        //get()捕获器会接收到目标对象、要查询的属性和代理对象三个参数。
+        let decoration="";
+        if (property==="foo") {
+            decoration="!!!";
+        }
+        return Reflect.get(...arguments)+decoration;
+    }
+};
+
+const proxy=new Proxy(target,handler);
+
+console.log(target.foo); // bar
+console.log(proxy.foo); // bar!!!
+
+console.log(proxy.baz); // qux
+console.log(target.baz); // qux
+
+const target={
+    foo:"bar"
+};
+
+
+const handler={
+    get(){
+        return 'intercepted';
+    }
+};
+
+const {proxy,revoke}=Proxy.revocable(target,handler);
+
+console.log(target.foo); // bar
+console.log(proxy.foo); // intercepted
+
+revoke();  //撤销函数
+
+console.log(proxy.foo);  //TypeError: Cannot perform 'get' on a proxy that has been revoked
+
+const target={
+    foo:"bar"
+};
+
+const firstProxy=new Proxy(target,{
+    get(){
+        console.log("first proxy");
+        return Reflect.get(...arguments);
+    }
+});
+
+const secondProxy=new Proxy(firstProxy,{
+    get(){
+        console.log("second proxy");
+        return Reflect.get(...arguments);
+    }
+});
+
+console.log(secondProxy.foo);  //
+// second proxy
+// first proxy
+// bar
+
+const mytarget={};
+
+const proxy=new Proxy(mytarget,{
+    get(target,property,receiver){
+        console.log('get()');
+        return Reflect.get(...arguments);
+    }
+});
+
+proxy.foo;  //get()
+
+const hiddenProperties = ['foo', 'bar'];
+
+const targetObject = {
+    foo: 1,
+    bar: 2,
+    baz: 3
+};
+
+const proxy=new Proxy(targetObject,{
+    get(target,property){
+        if (hiddenProperties.includes(property)) {
+            return undefined;
+        }else{
+            return Reflect.get(...arguments);
+        }
+    },
+    has(target,property){
+        if (hiddenProperties.includes(property)) {
+            return false;
+        }else{
+            return Reflect.has(...arguments);
+        }
+    },
+});
+
+// get()
+console.log(proxy.foo); // undefined
+console.log(proxy.bar); // undefined
+console.log(proxy.baz); // 3
+// has()
+console.log('foo' in proxy); // false
+console.log('bar' in proxy); // false
+console.log('baz' in proxy); // true
+
+class User {
+constructor(id) {
+this.id_ = id;
+}
+}
+
+const proxy=new Proxy(User,{
+    construct(target,argumentsList,newTarget){
+        if (argumentsList[0]===undefined) {
+            throw 'User cannot be instantiated without id';
+        }else{
+            return Reflect.construct(...arguments);
+        }
+    }
+});
+
+new proxy(1);
+new proxy();
+// Error: User cannot be instantiated without id
+
+const userList = [];
+
+function emit(newValue){
+    console.log(newValue);
+}
+
+const proxy=new Proxy(userList,{
+    set(target, property, value, receiver) {
+        const result=Reflect.set(...arguments);
+        if (result) {
+            emit(Reflect.get(target,property,receiver));
+        }
+        return result;
+    }
+});
+
+proxy.push('John');
+// John
+//1
+proxy.push('Jacob');
+// Jacob
+//2
+
+function double(value,success,failure) {
+    setTimeout(() => {
+        try{
+            if (typeof value!=="number") {
+                throw "Must provide number as first argument";
+            }
+            success(2*value);
+        }catch(e){
+            failure(e);
+        }
+    },1000);
+}
+
+const successCallback=(x)=>console.log(`success:${x}`);
+const failureCallback = (e) => console.log(`Failure: ${e}`);
+
+double(3,successCallback,failureCallback);  //Success: 6（大约 1000 毫秒之后）
+double('3',successCallback,failureCallback);  //Failure: Must provide number as first argument（大约 1000 毫秒之后）
+
+let p=new Promise(()=>{});
+setTimeout(console.log,0,p);  //Promise { <pending> }
+
+//调用 resolve()会把状态切换为兑现，
+let p1=new Promise((resolve,reject)=>resolve());
+setTimeout(console.log,0,p1);  //// Promise <resolved>
+
+//调用 reject()会把状态切换为拒绝。
+let p2=new Promise((resolve,reject)=>reject());
+setTimeout(console.log,0,p2);  // Promise <rejected>
+//UnhandledPromiseRejectionWarning: undefined
+
+let p = new Promise((resolve, reject) => setTimeout(resolve, 1000));
+
+// 在 console.log 打印期约实例的时候，还不会执行超时回调（即 resolve()）
+setTimeout(console.log, 0, p); // Promise <pending>
+
+
+const _proxy = (object,...prototypes) => {
+    // 补全代码
+    let proxy=new Proxy(object,{
+        get(object,property){
+            //target：目标对象。property：引用的目标对象上的字符串键属性。
+            if ([...prototypes].includes(property)) {
+                return "noright";
+            }else{
+                return Reflect.get(...arguments);
+            }
+        }
+    });
+    return proxy;
+}
+
+//const hiddenProperties = ['foo', 'bar'];
+const targetObject = {
+    foo: 1,
+    bar: 2,
+    baz: 3
+};
+
+let p=_proxy(targetObject,"foo","bar");
+console.log(p.foo); // noright
+console.log(p.bar); // noright
+console.log(p.baz); // 3
+
+let p1 = Promise.reject('foo');
+
+// 调用 then()时不传处理程序则原样向后传
+let p2 = p1.then();
+// Uncaught (in promise) foo
+
+setTimeout(console.log, 0, p2); // Promise <rejected>: foo
+
+// 这些都一样
+let p3 = p1.then(null, () => undefined);
+let p4 = p1.then(null, () => {});
+let p5 = p1.then(null, () => Promise.resolve());
+setTimeout(console.log, 0, p3); // Promise <resolved>: undefined
+setTimeout(console.log, 0, p4); // Promise <resolved>: undefined
+setTimeout(console.log, 0, p5); // Promise <resolved>: undefined
+
+// 这些都一样
+let p6 = p1.then(null, () => 'bar');
+let p7 = p1.then(null, () => Promise.resolve('bar'));
+setTimeout(console.log, 0, p6); // Promise <resolved>: bar
+setTimeout(console.log, 0, p7); // Promise <resolved>: bar
+
+// Promise.resolve()保留返回的期约
+let p8 = p1.then(null, () => new Promise(() => {}));
+let p9 = p1.then(null, () => Promise.reject());
+// Uncaught (in promise): undefined
+
+setTimeout(console.log, 0, p8); // Promise <pending>
+setTimeout(console.log, 0, p9); // Promise <rejected>: undefined
+
+let p10 = p1.then(null, () => { throw 'baz'; });
+// Uncaught (in promise) baz
+setTimeout(console.log, 0, p10); // Promise <rejected>: baz
+
+let p11 = p1.then(null, () => Error('qux'));
+setTimeout(console.log, 0, p11); // Promise <resolved>: Error: qux
+
+let p=Promise.reject();
+let onRejected=function(e){
+    setTimeout(console.log,0,"rejected");
+}
+
+// 这两种添加拒绝处理程序的方式是一样的：
+p.then(null,onRejected);  //rejected
+p.catch(onRejected);  //rejected
+
+let p1=Promise.resolve();
+let p2=Promise.reject();
+let onFinally=function(){
+    setTimeout(console.log,0,"Finally!");
+}
+
+p1.finally(onFinally); // Finally
+p2.finally(onFinally); // Finally
+
+let p1 = Promise.resolve("foo");
+
+// 这里都会原样后传
+let p2=p1.finally();
+let p3=p1.finally(()=>undefined);
+let p4=p1.finally(()=>{});
+let p5=p1.finally(()=>Promise.resolve());
+let p6=p1.finally(()=>"bar");
+let p7=p1.finally(()=>Promise.resolve("bar"));
+let p8=p1.finally(()=>Error("qux"));
+
+setTimeout(console.log, 0, p2); // Promise <resolved>: foo
+setTimeout(console.log, 0, p3); // Promise <resolved>: foo
+setTimeout(console.log, 0, p4); // Promise <resolved>: foo
+setTimeout(console.log, 0, p5); // Promise <resolved>: foo
+setTimeout(console.log, 0, p6); // Promise <resolved>: foo
+setTimeout(console.log, 0, p7); // Promise <resolved>: foo
+setTimeout(console.log, 0, p8); // Promise <resolved>: foo
+
+// Promise.resolve()保留返回的期约
+let p9=p1.finally(()=>new Promise(()=>{}));
+let p10=p1.finally(()=>Promise.reject());
+// Uncaught (in promise): undefined
+setTimeout(console.log, 0, p9); // Promise <pending>
+setTimeout(console.log, 0, p10); // Promise <rejected>: undefined
+
+let p11=p1.finally(()=>{throw "baz";});
+// Uncaught (in promise) baz
+
+setTimeout(console.log,0,p11);  //Promise <rejected>: baz
+
+// 创建解决的期约
+let p=Promise.resolve();
+
+// 添加解决处理程序
+// 直觉上，这个处理程序会等期约一解决就执行
+p.then(()=>console.log("onResolved handler"));
+
+//同步输出，证明 then()已经返回
+console.log("then() return");
+
+//实际的输出：
+// then() returns
+// onResolved handler
+
+let synchronousResolve;
+
+// 创建解决的期约
+let p=new Promise((resolve)=>{
+    synchronousResolve=function(){
+        console.log('1: invoking resolve()');
+        resolve();
+        console.log('2: resolve() returns');
+    };
+})
+
+// 添加解决处理程序
+// 直觉上，这个处理程序会等期约一解决就执行
+p.then(() => console.log('4: then() handler executes'));
+
+synchronousResolve();
+console.log('3: synchronousResolve() returns');
+
+// 实际的输出：
+// 1: invoking resolve()
+// 2: resolve() returns
+// 3: synchronousResolve() returns
+// 4: then() handler executes
+
+let p1=Promise.resolve();
+p1.then(()=>console.log("p1.then() onResolved"));
+
+let p2=Promise.reject();
+p2.then(null,()=>console.log("p2.then() onRejected"));
+
+let p3=Promise.reject();
+p3.catch(()=>console.log("p3.catch() onRejected"));
+console.log("p3.catch() returns");
+
+let p4=Promise.resolve();
+p4.finally(()=>console.log("p4.finally() onFinally"));
+console.log("p4.finally() returns");
+
+/*
+p3.catch() returns
+p4.finally() returns
+p1.then() onResolved
+p2.then() onRejected
+p3.catch() onRejected
+p4.finally() onFinally
+*/
+
