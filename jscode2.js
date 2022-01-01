@@ -1018,3 +1018,405 @@ p3.catch() onRejected
 p4.finally() onFinally
 */
 
+
+let p=new Promise((resolve,reject)=>{
+    console.log("first");
+    resolve();
+});
+p.then(()=>console.log("second"))
+    .then(()=>console.log("third"))
+    .then(()=>console.log("fourth"));
+// first
+// second
+// third
+// fourth
+
+let p=new Promise((resolve,reject)=>{
+    console.log("p1 executor");
+    setTimeout(resolve,1000);
+});
+p.then(()=>new Promise((resolve,reject)=>{
+        console.log("p2 executor");
+        setTimeout(resolve,1000);
+    }))
+    .then(()=>new Promise((resolve,reject)=>{
+        console.log("p3 executor");
+        setTimeout(resolve,1000);
+    }))
+    .then(()=>new Promise((resolve,reject)=>{
+        console.log("p4 executor");
+        setTimeout(resolve,1000);
+    }));
+
+function delayedResolve(str){
+    return new Promise((resolve,reject)=>{
+        console.log(str);
+        setTimeout(resolve,1000);
+    });
+}
+
+delayedResolve("p1 executor")
+    .then(()=>delayedResolve("p2 executor"))
+    .then(()=>delayedResolve("p3 executor"))
+    .then(()=>delayedResolve("p4 executor"));
+// p1 executor（1 秒后）
+// p2 executor（2 秒后）
+// p3 executor（3 秒后）
+// p4 executor（4 秒后）
+
+let A = new Promise((resolve, reject) => {
+    console.log('A');
+    resolve();
+});
+
+let B=A.then(()=>console.log("B"));
+let C=A.then(()=>console.log("C"));
+
+B.then(()=>console.log("D"));
+B.then(()=>console.log("E"));
+C.then(()=>console.log("F"));
+C.then(()=>console.log("G"));
+
+//A B C D E F G
+
+let p1=Promise.all([
+    Promise.resolve(),
+    Promise.resolve()
+]);
+
+// 可迭代对象中的元素会通过 Promise.resolve()转换为期约
+let p2=Promise.all([3,4]);
+
+// 空的可迭代对象等价于 Promise.resolve()
+let p3=Promise.all([]);
+
+// 无效的语法
+let p4=Promise.all();
+//TypeError: undefined is not iterable (cannot read property Symbol(Symbol.iterator))
+let p=Promise.all([
+    Promise.resolve(),
+    new Promise((resolve,reject)=>setTimeout(resolve,1000))
+]);
+
+setTimeout(console.log,0,p);  //Promise <pending>
+
+p.then(()=>setTimeout(console.log,0,"all() resolved"))
+// all() resolved!（大约 1 秒后）
+
+let p1=Promise.race([
+    Promise.resolve(),
+    Promise.resolve()
+]);
+
+// 可迭代对象中的元素会通过 Promise.resolve()转换为期约
+let p2=Promise.race([3,4]);
+
+// 空的可迭代对象等价于 new Promise(() => {})
+let p3=Promise.race([]);
+
+// 无效的语法
+let p4 = Promise.race();
+// TypeError: cannot read Symbol.iterator of undefined
+
+// 解决先发生，超时后的拒绝被忽略
+let p1=Promise.race([
+    Promise.resolve(3),
+    new Promise((resolve,reject)=>setTimeout(reject,1000))
+]);
+setTimeout(console.log,0,p1);  //Promise { 3 }
+
+// 拒绝先发生，超时后的解决被忽略
+let p2 = Promise.race([
+    Promise.reject(4),
+    new Promise((resolve, reject) => setTimeout(resolve, 1000))
+]);
+setTimeout(console.log, 0, p2); // Promise <rejected>: 4
+
+// 迭代顺序决定了落定顺序
+let p3 = Promise.race([
+    Promise.resolve(5),
+    Promise.resolve(6),
+    Promise.resolve(7)
+]);
+setTimeout(console.log, 0, p3); // Promise <resolved>: 5
+
+function addTwo(x) {return x + 2;}
+function addThree(x) {return x + 3;}
+function addFive(x) {return x + 5;}
+
+function addTen(x){
+    return Promise.resolve(x)
+        .then(addTwo)
+        .then(addThree)
+        .then(addFive);
+}
+
+addTen(8).then(console.log); // 18
+
+function addTwo(x) {return x + 2;}
+function addThree(x) {return x + 3;}
+function addFive(x) {return x + 5;}
+
+function addTen(x){
+    return [addTwo,addThree,addFive]
+        .reduce((promise,fn)=>promise.then(fn),Promise.resolve(x));
+}
+
+addTen(8).then(console.log); // 18
+
+function compose(...fns){
+    return (x)=>fns.reduce((promise,fn)=>promise.then(fn),Promise.resolve(x));
+}
+
+let addTen = compose(addTwo, addThree, addFive);
+addTen(8).then(console.log); // 18
+
+    class CancelToken{
+        constructor(cancelFn){
+            this.promise=new Promise((resolve,reject)=>{
+                cancelFn(()=>{
+                    setTimeout(console.log,0,"delay cancelled");
+                    resolve();
+                });
+            });
+        }
+    }
+
+    const startButton = document.querySelector('#start');
+    const cancelButton = document.querySelector('#cancel');
+
+    function cancellableDelayedResolve(delay) {
+        setTimeout(console.log,0,"set delay");
+        return new Promise((resolve,reject)=>{
+            const id=setTimeout((()=>{
+                setTimeout(console.log,0,"delay resolve");
+                resolve();
+            }),delay);
+            const cancelToken=new CancelToken((cancelCallback)=>
+                cancelButton.addEventListener("click",cancelCallback));
+            cancelToken.promise.then(()=>clearTimeout(id));
+        });
+    }
+    startButton.addEventListener("click",()=>cancellableDelayedResolve(1000));
+
+class TrackablePromise extends Promise{
+    constructor(executor){
+        const notifyHandlers=[];
+        super((resolve,reject)=>{
+            return executor(resolve,reject,(status)=>{
+                notifyHandlers.map((handler)=>handler(status));
+            });
+        });
+        this.notifyHandlers=notifyHandlers;
+    }
+    notify(notifyHandler){
+        this.notifyHandlers.push(notifyHandler);
+        return this;
+    }
+}
+
+let p=new TrackablePromise((resolve,reject,notify)=>{
+    function countdown(x){
+        if (x>0) {
+            notify(`${20*x}% remaining`);
+            setTimeout(()=>countdown(x-1),1000);
+        }else{
+            resolve();
+        }
+    }
+    countdown(5);
+});
+
+p.notify((x)=>setTimeout(console.log,0,"a:",x))
+    .notify((x)=>setTimeout(console.log,0,"b:",x));
+p.then(()=>setTimeout(console.log,0,"completed"));
+
+// （约 1 秒后） a: 80% remaining
+// （约 1 秒后） b: 80% remaining
+// （约 2 秒后） a: 60% remaining
+// （约 2 秒后） b: 60% remaining
+// （约 3 秒后） a: 40% remaining
+// （约 3 秒后） b: 40% remaining
+// （约 4 秒后） a: 20% remaining
+// （约 4 秒后） b: 20% remaining
+// （约 5 秒后） completed
+
+async function foo(){}
+
+let bar=async function(){};
+
+let baz=async ()=>{};
+
+class Qux{
+    async qux(){}
+}
+
+// 返回一个原始值
+async function foo(){
+    return "foo";
+}
+// 给返回的期约添加一个解决处理程序
+foo().then(console.log);
+//foo
+
+// 返回一个没有实现 thenable 接口的对象
+async function bar(){
+    return ["bar"];
+}
+bar().then(console.log);
+//[ 'bar' ]
+
+// 返回一个实现了 thenable 接口的非期约对象
+async function baz(){
+    const thenable={
+        then(callback){
+            callback("baz");
+        }
+    };
+    return thenable;
+}
+baz().then(console.log);
+//baz
+
+// 返回一个期约
+async function qux(){
+    return Promise.resolve("qux");
+}
+qux().then(console.log);
+//qux
+
+async function foo() {
+    let p=new Promise((resolve,reject)=>setTimeout(resolve,1000,3));
+    console.log(await p);
+}
+foo();
+//3
+
+// 异步打印"foo"
+async function foo() {
+    console.log(await Promise.resolve("foo"));
+}
+foo();
+//foo
+
+// 异步打印"bar"
+async function bar() {
+    return await Promise.resolve("bar");
+}
+bar().then(console.log);
+// bar
+
+// 1000 毫秒后异步打印"baz"
+async function baz(){
+    await new Promise((resolve,reject)=>setTimeout(resolve,1000));
+    console.log("baz");
+}
+baz();
+// baz（1000 毫秒后）
+
+// 等待一个原始值
+async function foo() {
+    console.log(await "foo");
+}
+foo();
+//foo
+
+// 等待一个没有实现 thenable 接口的对象
+async function bar() {
+    console.log(await ["bar"]);
+}
+bar();
+// ['bar']
+
+// 等待一个实现了 thenable 接口的非期约对象
+async function baz(){
+    const thenable = {
+        then(callback) { callback('baz'); }
+    };
+    console.log(await thenable);
+}
+baz();
+// baz
+
+// 等待一个期约
+async function qux(){
+    console.log(await Promise.resolve("qux"));
+}
+qux();
+//qux
+
+
+    //需要匹配最大负数索引边界，动态变化
+    let maxNegativeIndex=negativeInterger.length-1;
+    for (let i=0;i<positiveInterger.length-1;i++){
+        //两负一正时
+        if (maxNegativeIndex===-1) {
+            //当正整数遍历完时，退出
+            break;
+        }
+        for (let j=i+1;j<positiveInterger.length;i++){
+            //计算两个负数和后取绝对值
+            if (maxNegativeIndex===-1) {
+                //当正整数遍历完时，退出
+                break;
+            }
+            let PositiveSum=-(positiveInterger[i]+positiveInterger[j]);
+            //去找是否有相等的值
+            for (let k=maxNegativeIndex;k>=0;k--){
+                //因为是排好序的
+                if (negativeInterger[k]<PositiveSum) {
+                    //如果小于则不存在，退出
+                    break;
+                }else if(negativeInterger[k]>PositiveSum) {
+                    //如果大于，则往前查找，最大正数索引边界减一
+                    maxNegativeIndex--;
+                }else{
+                    //如果相等
+                    newArr.push([positive[i],positiveInterger[j],negativeInterger[k]]);
+                    //移动最大位，可以避免重复
+                    maxNegativeIndex--;
+                    break;
+                }
+            }
+        }
+    }
+
+async function sleep(delay){
+    return new Promise((resolve,reject)=>setTimeout(resolve,delay));
+}
+
+async function foo(){
+    const t0=Date.now();
+    await sleep(1500);  //暂停约 1500 毫秒
+    console.log(Date.now()-t0);
+}
+
+foo();  //1509
+
+//apply
+function bindThis(f, oTarget) {
+    return function(){
+        return f.apply(oTarget,arguments);
+    }
+}
+
+//bind
+function bindThis(f, oTarget) {
+    return f.bind(oTarget);
+}
+
+//call
+function bindThis(f, oTarget) {
+    return function(){
+        return f.call(oTarget,...arguments);
+    }
+}
+
+let str1=[0,1,false, true, undefined, null, NaN, {},{a:1},'a'];
+
+for (let i=0;i<str1.length;i++){
+    for (let j=i;j<str1.length;j++){
+        console.log(`${str1[i]}===${str1[j]} : ${str1[i]===str1[j]}`);
+    }
+}
+

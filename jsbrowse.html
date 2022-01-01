@@ -5,17 +5,25 @@
 	<title>test js</title>
 </head>
 <body>
-
-<script type="text/javascript">
 	
-let p1 = new Promise((resolve, reject) => reject(Error('foo')));
-let p2 = new Promise((resolve, reject) => { throw Error('foo'); });
-let p3 = Promise.resolve().then(() => { throw Error('foo'); });
-let p4 = Promise.reject(Error('foo'));
-setTimeout(console.log, 0, p1); // Promise <rejected>: Error: foo
-setTimeout(console.log, 0, p2); // Promise <rejected>: Error: foo
-setTimeout(console.log, 0, p3); // Promise <rejected>: Error: foo
-setTimeout(console.log, 0, p4); // Promise <rejected>: Error: foo
+<script type="text/javascript">
+
+async function foo() {
+	console.log(await Promise.resolve('foo'));
+}
+async function bar() {
+	console.log(await 'bar');
+}
+async function baz() {
+	console.log('baz');
+}
+
+foo();
+bar();
+baz();
+// baz
+// foo
+// bar
 
 </script>
 
