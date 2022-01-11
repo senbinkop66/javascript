@@ -1420,3 +1420,246 @@ for (let i=0;i<str1.length;i++){
     }
 }
 
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} list1
+ * @param {ListNode} list2
+ * @return {ListNode}
+ */
+function ListNode(val,next){
+    this.val = (val===undefined ? 0 : val)
+    this.next = (next===undefined ? null : next)
+}
+
+var mergeTwoLists = function(list1, list2) {
+    const head=new ListNode();
+    let list3=head;
+    while(list1!=null && list2!=null){
+        if (list1.val<list2.val) {
+            list3.next=list1;
+            list1=list1.next;
+        }else{
+            list3.next=list2;
+            list2=list2.next;
+        }
+        list3=list3.next;
+    }
+    // 合并后 l1 和 l2 最多只有一个还未被合并完，我们直接将链表末尾指向未合并完的链表即可
+    list3.next=list1===null ? list2:list1;
+    //注意返回的是什么
+    return head.next;
+};
+
+let str1 = [-9,3];
+let str2=[5,7];
+let list1=new ListNode();
+let list2=new ListNode();
+let head1=list1;
+let head2=list2;
+for (let i=0;i<str1.length;i++){
+    list1.val=str1[i];
+    list1.next=new ListNode();
+    list1=list1.next;
+}
+//console.log(head1);
+for (let i=0;i<str2.length;i++){
+    list2.val=str2[i];
+    list2.next=new ListNode();
+    list2=list2.next;
+}
+//console.log(head2);
+
+let result=mergeTwoLists(head1,head2);
+console.log(result);
+
+function formatDate(date,format) {
+    let obj={};
+    let items=["yyyy","yy","MM","M","dd","d","HH","H","hh","h","mm","m","ss","s","w"];
+
+    obj[items[0]]=date.getFullYear();  ////yyyy: 年份,  从 Date 对象以四位数字返回年份。
+    obj[items[1]]=obj[items[0]].toString().slice(2);  //yy: 年份
+
+    obj[items[3]]=date.getMonth()+1;  //,M: 月份  ,从 Date 对象返回月份 (0 ~ 11)。
+    obj[items[2]]=obj[items[3]]<10 ? "0"+""+obj[items[3]] : obj[items[3]];  //MM: 月份，补满两位
+
+    obj[items[5]]=date.getDate();  //d: 日期,  从 Date 对象返回一个月中的某一天 (1 ~ 31)。
+    obj[items[4]]=obj[items[5]]<10 ? "0"+""+obj[items[5]] : obj[items[5]];  //dd: 日期，补满两位
+
+    obj[items[7]]=date.getHours();  //H: 24制小时, 返回 Date 对象的小时 (0 ~ 23)。
+    obj[items[6]]=obj[items[7]]<10 ? "0"+""+obj[items[7]] : obj[items[7]];  //HH: 24制小时，补满两位
+    //
+    obj[items[9]]=obj[items[7]]>12 ? obj[items[7]]-12 : obj[items[7]];  //h: 12制小时
+    obj[items[8]]=obj[items[9]]<10 ? "0"+""+obj[items[9]] : obj[items[9]];  //hh: 12制小时，补满两位
+
+    obj[items[11]]=date.getMinutes();  //m: 分钟, 返回 Date 对象的分钟 (0 ~ 59)。
+    obj[items[10]]=obj[items[11]]<10 ? "0"+""+obj[items[11]] : obj[items[11]];  //mm: 分钟，补满两位
+
+    obj[items[13]]=date.getSeconds();  //s:秒, 返回 Date 对象的秒数 (0 ~ 59)。
+    obj[items[12]]=obj[items[13]]<10 ? "0"+""+obj[items[13]] : obj[items[13]];  //ss: 秒，补满两位
+
+    obj[items[14]]= ['日', '一', '二', '三', '四', '五', '六'][date.getDay()]    //w 星期,从 Date 对象返回一周中的某一天 (0 ~ 6)。
+    //let milliSecond=date.getMilliseconds();  //返回 Date 对象的毫秒(0 ~ 999)。
+    for (let i=0;i<items.length;i++){
+        let reg=new RegExp(items[i],"g");
+        format=format.replace(reg,obj[items[i]]);
+    }
+    //console.log(obj);
+    return format;
+
+}
+
+let date=new Date(1409894060000);
+format="yyyy-MM-dd HH:mm:ss 星期w"
+let result=formatDate(date,format);
+console.log(result);
+
+function isAvailableEmail(sEmail) {
+    // \w  单词字符包括：a-z、A-Z、0-9，以及下划线, 包含 _ (下划线) 字符。
+    // n+  匹配任何包含至少一个 n 的字符串
+    let reg=/^([\w+\.])+@\w+([.]\w+)+$/;
+    return reg.test(sEmail);
+}
+
+let str1='fheo221wio@qq.com';
+let result=isAvailableEmail(str1);
+console.log(result);
+
+function speak(fn, obj) {
+    // 方法1 将函数fn直接挂载到obj上
+    obj.fn = fn;
+    return obj.fn();
+    //this的指向是动态变化的,需要把this的指向固定，所以就有了以下三种方法
+    //call()、apply()、bind() 都是用来重定义 this 这个对象的
+    //call 的参数是直接放进去的
+    //apply 的所有参数都必须放在一个数组里面传进去
+    //bind 除了返回是函数,它的参数和 call 一样
+    return fn.apply(obj);
+    return fn.call(obj);
+    return fn.bind(obj);
+}
+
+/**
+ * @param {number} dividend
+ * @param {number} divisor
+ * @return {number}
+ */
+var divide = function(dividend, divisor) {
+    const MAX_VALUE=2**31-1;
+    const MIN_VALUE=-(2**31);
+
+    // 考虑被除数为最小值的情况
+    if (dividend===MIN_VALUE) {
+        if (divisor===1) {
+            //直接返回答案-2^31
+            return MIN_VALUE;
+        }
+        if (divisor===-1) {
+            //为2^31,产生了溢出。此时我们需要返回2^31-1
+            return MAX_VALUE;
+        }
+    }
+
+    //考虑除数为最小值的情况
+    if (divisor===MIN_VALUE) {
+        //被除数只有为MIN_VALUE时为1，其他都为0
+        return dividend===MIN_VALUE ? 1: 0;
+    }
+
+    // 考虑被除数为 0 的情况
+    if (dividend===0) {
+        return 0;
+    }
+
+    // 一般情况，使用类二分查找
+    // 将所有的正数取相反数，这样就只需要考虑一种情况
+    let rev=false;
+    if(dividend>0){
+        dividend=-dividend;
+        rev=!rev;
+    }
+    if (divisor>0) {
+        divisor=-divisor;
+        rev=!rev;
+    }
+
+    //类二分查找
+    const candidates=[divisor];
+    let index=0;
+    //注意溢出
+    while(candidates[index]>=dividend-candidates[index]){
+        //处理的都是负数
+        candidates.push(candidates[index]+candidates[index]);
+        index++;
+    }
+    //console.log(candidates);
+    let ans=0;
+    console.log(ans,dividend);
+    for (let i=candidates.length-1;i>=0;--i){
+        if (candidates[i]>=dividend) {
+            ans+=1<<i;
+            dividend-=candidates[i];
+            console.log(ans,dividend);
+
+        }
+    }
+    return rev ? -ans : ans;
+};
+
+
+let str1 = 100000;
+let str2 = 33;
+let result=divide(str1,str2);
+console.log(result);
+
+//原型模式
+function createModule(str1, str2) {
+    function obj(){};
+    //使用函数表达式也可
+    //let obj= function() {}
+    obj.prototype.greeting=str1;
+    obj.prototype.name=str2;
+    obj.prototype.sayIt=function(){
+        return this.greeting+", "+this.name;
+    }
+    return new obj();
+}
+
+//构造函数模式
+function createModule(str1, str2) {
+    function obj(){
+        this.greeting=str1;
+        this.name=str2;
+        this.sayIt=function(){
+            return this.greeting+", "+this.name;
+        }
+    }
+    return new obj();
+}
+
+//工厂模式
+function createModule(str1, str2) {
+    let o=new Object();
+    o.greeting=str1;
+    o.name=str2;
+    o.sayIt=function(){
+         return this.greeting+", "+this.name;
+    }
+    return o;
+}
+
+//字面量模式
+function createModule(str1, str2) {
+    var obj =
+            {
+                greeting : str1,
+                name : str2,
+                sayIt : function(){return this.greeting + ", " + this.name;}
+            };
+    return obj;    
+
