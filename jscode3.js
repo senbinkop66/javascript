@@ -719,3 +719,82 @@ var hasPathSum = function(root, targetSum) {
         console.log(`${key}=${value}`);
     }
 
+
+    let db,request,version=1;
+    request=indexedDB.open("admin",version);
+    request.onerror=(event)=>{
+        console.log(`Failed to open : ${event.target.errorCode}`);
+    };
+    request.onsuccess=(event)=>{
+        db=event.target.result;
+    };
+
+    let user={
+        username:"007",
+        firstName:"James",
+        lastName:"Bond",
+        passward:"foo"
+    };
+
+    request.onupgradeneeded=(event)=>{
+        const db=event.target.result;
+        // 如果存在则删除当前 objectStore。测试的时候可以这样做
+        // 但这样会在每次执行事件处理程序时删除已有数据
+        if (db.objectStoreNames.contains("users")) {
+            db.deleteObjectStore("users");
+        }
+        db.createObjectStore("users",{keyPath:"username"});
+    }
+
+    let transaction=db.transaction("users");
+    let transaction = db.transaction("users", "readwrite");
+var MinStack = function() {
+    this.data=new Array();
+    this.minValue=new Array();  //存储每一个栈顶对应的最小值
+};
+
+/** 
+ * @param {number} val
+ * @return {void}
+ */
+MinStack.prototype.push = function(val) {
+    if (this.data.length===0) {
+        this.minValue.push(val)
+    }else{
+        this.minValue.push(Math.min(this.minValue[this.minValue.length-1],val));
+    }
+    //顺序不能反
+    this.data.push(val);
+};
+
+/**
+ * @return {void}
+ */
+MinStack.prototype.pop = function() {
+    this.data.pop();
+    this.minValue.pop();
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.top = function() {
+    return this.data[this.data.length-1];
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.getMin = function() {
+    return this.minValue[this.minValue.length-1];
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * var obj = new MinStack()
+ * obj.push(val)
+ * obj.pop()
+ * var param_3 = obj.top()
+ * var param_4 = obj.getMin()
+ */
+
