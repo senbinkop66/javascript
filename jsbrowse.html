@@ -8,42 +8,22 @@
 	</style>
 </head>	
 <body>
-	<div id="myDiv">Click Me</div>
+	<!-- 没有内容，因此没有文本节点 -->
+	<div></div>
+	<!-- 有空格，因此有一个文本节点 -->
+	<div> </div>
+	<!-- 有内容，因此有一个文本节点 -->
+	<div>Hello World!</div>
+	<button onclick="changeText()">更改文本</button>
+
 </body>
 <script type="text/javascript">
-	let db,request,version=1;
-	request=indexedDB.open("admin",version);
-	request.onerror=(event)=>{
-		console.log(`Failed to open : ${event.target.errorCode}`);
-	};
-	request.onsuccess=(event)=>{
-		db=event.target.result;
-	};
-
-	let user={
-		username:"007",
-		firstName:"James",
-		lastName:"Bond",
-		passward:"foo"
-	};
-
-	request.onupgradeneeded=(event)=>{
-		const db=event.target.result;
-		// 如果存在则删除当前 objectStore。测试的时候可以这样做
-		// 但这样会在每次执行事件处理程序时删除已有数据
-		if (db.objectStoreNames.contains("users")) {
-			db.deleteObjectStore("users");
-		}
-		db.createObjectStore("users",{keyPath:"username"});
+	let div=document.getElementsByTagName("div");
+	console.log(div);
+	function changeText(){
+		div[1].firstChild.nodeValue = "Some other message";
+		console.log("dd");
 	}
-
-	let transaction=db.transaction("users","readwrite");
-	let store=transaction.objectStore("users");
-	request=store.get("007");
-	request.onerror=(event) => console.log("Did not get the object!");
-	request.onsuccess=(event)=>console.log(event.target.result.firstName);
-
-
 
 
 </script>
