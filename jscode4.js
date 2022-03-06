@@ -1124,5 +1124,281 @@ render();
 render();
 render();
 
+var calculateBonus = function( performanceLevel, salary ){
+   if ( performanceLevel === 'S' ){
+      return salary * 4;
+   }
+   if ( performanceLevel === 'A' ){
+      return salary * 3;
+   }
+   if ( performanceLevel === 'B' ){
+      return salary * 2;
+   }
+};
+calculateBonus( 'B', 20000 ); // 输出：40000
+calculateBonus( 'S', 6000 ); // 输出：24000
+
+var performanceS=function(){};
+performanceS.prototype.calculate = function( salary ){
+   return salary * 4;
+};
+
+var performanceA=function(){};
+performanceA.prototype.calculate = function( salary ){
+   return salary * 3;
+};
+
+var performanceB=function(){};
+performanceB.prototype.calculate = function( salary ){
+   return salary * 2;
+};
+
+//接下来定义奖金类 Bonus：
+var Bonus=function(){
+   this.salary=null;  // 原始工资
+   this.strategy=null;  //绩效等级对应的策略对象
+}
+Bonus.prototype.setSalary=function(salary){
+   this.salary=salary;  // 设置员工的原始工资
+}
+Bonus.prototype.setStrategy = function( strategy ){
+   this.strategy = strategy;  // 设置员工绩效等级对应的策略对象
+};
+
+Bonus.prototype.getBonus=function(){  // 取得奖金数额
+   if (!this.strategy) {
+      throw new Error("未设置strategy属性");
+   }
+   return this.strategy.calculate(this.salary);  // 把计算奖金的操作委托给对应的策略对象
+}
+
+var bonus=new Bonus();
+bonus.setSalary(10000);
+bonus.setStrategy(new performanceS());  // 设置策略对象
+console.log( bonus.getBonus() ); // 输出：40000
+
+bonus.setStrategy( new performanceA() ); // 设置策略对象
+console.log( bonus.getBonus() ); // 输出：30000
+
+
+
+
+import axios from 'axios';
+
+// 为给定 ID 的 user 创建请求
+axios.get('/user?ID=12345').then(function(response){
+   console.log(response);
+}).catch(function(error){
+   console.log(error);
+});
+
+// 上面的请求也可以这样做
+axios.get('/user',{
+   params:{
+      ID:12345
+   }
+}).then(function(response){
+   console.log(response);
+}).catch(function(error){
+   console.log(error);
+});
+
+function getUserAccount(){
+   return axios.get("user/12345");
+}
+function getUserPermission(){
+   return axios.get("user/12345/permissions")
+}
+axios.all([getUserAccount(),getUserPermission()])
+   .then(axios.spread(function(acct,prems){
+      // 两个请求现在都执行完成//
+   }));
+
+// 发送 POST 请求
+axios({
+   method:'post',
+   url:'/url/12345',
+   data:{
+      firstName:"sadio",
+      lastName:"mane"
+   }
+})
+
+
+import axios from 'axios';
+import fs from 'fs';
+
+
+// 获取远端图片
+axios({
+   method:'get',
+   url:'http://guolab.whu.edu.cn/geptop/image/fasta_protein.png',
+   responseType:'stream'
+}).then((response)=>{
+   response.data.pipe(fs.createWriteStream("./test1.jpg"));
+   console.log("success");
+});
+
+
+var tween={
+   linear:function(t,b,c,d){
+      return c*t/d+b;
+   },
+   easeIn:function(t,b,c,d){
+      return c*(t/=d)*t+b;
+   },
+   strongEaseIn: function(t, b, c, d){
+      return c * ( t /= d ) * t * t * t * t + b;
+   },
+   strongEaseOut: function(t, b, c, d){
+      return c * ( ( t = t / d - 1) * t * t * t * t + 1 ) + b;
+   },
+   sineaseIn: function( t, b, c, d ){
+      return c * ( t /= d) * t * t + b;
+   },
+   sineaseOut: function(t,b,c,d){
+      return c * ( ( t = t / d - 1) * t * t + 1 ) + b;
+   }
+};
+
+var Animate=function(dom){
+  this.dom = dom; // 进行运动的 dom 节点
+  this.startTime = 0; // 动画开始时间
+  this.startPos = 0; // 动画开始时，dom 节点的位置，即 dom 的初始位置
+  this.endPos = 0; // 动画结束时，dom 节点的位置，即 dom 的目标位置
+  this.propertyName = null; // dom 节点需要被改变的 css 属性名
+  this.easing = null; // 缓动算法
+  this.duration = null; // 动画持续时间
+};
+
+Animate.prototype.start=function(propertyName,endPos,duration,easing){
+  this.startTime=+new Date;  //动画启动时间
+  this.startPos=this.dom.getBoundingClientRect()[propertyName];  //dom 节点初始位置
+  this.propertyName=propertyName;  //dom 节点需要被改变的 CSS 属性名
+  this.endPos=endPos;  //dom 节点目标位置
+  this.duration=duration;  //动画持续事件
+  this.easing=tween[easing];  //缓动算法
+
+  var self=this;
+  var timeId=setInterval(function(){  //启动定时器，开始执行动画
+    if (self.step()===false) {
+      clearInterval(timeId);  //如果动画已结束，则清除定时器
+    }
+  },200);
+};
+
+Animate.prototype.step=function(){
+  var t=+new Date;  //取得当前时间
+  if (t>=this.startTime+this.duration) {  //(1)
+    this.update(this.endPos);  //更新小球的 CSS 属性值
+    return false;
+  }
+  var pos=this.easing(t-this.startTime,this.startPos,this.endPos-this.startPos,this.duration);  //pos 为小球当前位置
+  this.update(pos);  //更新小球的 CSS 属性值
+};
+
+Animate.prototype.update=function(pos){
+  this.dom.style[this.propertyName]=pos+"px";
+};
+
+var div = document.getElementById( 'div' );
+var animate = new Animate( div );
+//animate.start( 'left', 500, 1500, 'strongEaseOut' );
+animate.start( 'top', 200, 1500, 'sineaseIn' );
+
+var strategies={
+  isNonEmpty:function(value,errorMessage){
+    if (value==="") {
+      return errorMessage;
+    }
+  },
+  minLength:function(value,length,errorMessage){
+    if (value.length<length) {
+      return errorMessage;
+    }
+  },
+  isMobile:function(value,errorMessage){
+    if (!/(^1[3|5|8][0-9]{9}$)/.test(value)) {
+      return errorMessage;
+    }
+  },
+};
+
+var Validator=function(){
+  this.cache=[];  //保存校验规则
+};
+
+Validator.prototype.add = function( dom, rule, errorMsg ){
+  var ary = rule.split( ':' ); // 把 strategy 和参数分开
+  this.cache.push(function(){ // 把校验的步骤用空函数包装起来，并且放入 cache
+    var strategy = ary.shift(); // 用户挑选的 strategy
+    ary.unshift( dom.value ); // 把 input 的 value 添加进参数列表
+    ary.push( errorMsg ); // 把 errorMsg 添加进参数列表
+    return strategies[ strategy ].apply( dom, ary );
+  });
+};
+Validator.prototype.start = function(){
+  for ( var i = 0, validatorFunc; validatorFunc = this.cache[ i++ ]; ){
+    var msg = validatorFunc(); // 开始校验，并取得校验后的返回信息
+    if ( msg ){ // 如果有确切的返回值，说明校验没有通过
+      return msg;
+    }
+  }
+};
+
+var validateFunc=function(){
+  var validator=new Validator();  //创建一个 validator 对象
+  //添加一些校验规则
+  validator.add( registerForm.userName, 'isNonEmpty', '用户名不能为空' );
+  validator.add( registerForm.password, 'minLength:6', '密码长度不能少于 6 位' );
+  validator.add( registerForm.phoneNumber, 'isMobile', '手机号码格式不正确' );
+  var errorMsg = validator.start(); // 获得校验结果
+  return errorMsg; // 返回校验结果
+}
+
+var registerForm = document.getElementById( 'registerForm' );
+registerForm.onsubmit = function(){
+    var errorMsg = validateFunc(); // 如果 errorMsg 有确切的返回值，说明未通过校验
+    if ( errorMsg ){
+      alert ( errorMsg );
+      return false; // 阻止表单提交
+    }
+};
+
+/**
+ * @param {string} a
+ * @param {string} b
+ * @return {number}
+ */
+var findLUSlength = function(a, b) {
+   let m=a.length;
+   let n=b.length;
+   if (m!==n) {
+      return Math.max(m,n);
+   }
+   while(m>0){
+      m--;
+      if (a[m]!==b[m]) {
+         return Math.max(m+1,n-m-1);
+      }
+   }
+   return -1;
+};
+
+let a = "aba", b = "cdc";
+let result=findLUSlength(a,b);
+console.log(result);
+
+var myImage=(function(){
+  var imaNode=document.createElement("img");
+  document.body.appendChild(imaNode);
+  return {
+    setSrc:function(src){
+      imaNode.src=src;
+    }
+  }
+})();
+
+myImage.setSrc("https://v3.cn.vuejs.org/images/components_provide.png")
 
 
