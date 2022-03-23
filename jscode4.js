@@ -1401,4 +1401,968 @@ var myImage=(function(){
 
 myImage.setSrc("https://v3.cn.vuejs.org/images/components_provide.png")
 
+var myImage=(function(){
+  var imgNode=document.createElement("img");
+  document.body.appendChild(imgNode);
+  return {
+    setSrc:function(src){
+      imgNode.src=src;
+    }
+  }
+})();
+
+var proxyImage=(function(){
+  var img=new Image;
+  img.onload=function(){
+    myImage.setSrc(this.src);
+  }
+  return {
+    setSrc:function(src){
+      myImage.setSrc("../image/CSS 轮廓.png");
+      img.src=src;
+    }
+  }
+})();
+
+proxyImage.setSrc("https://v3.cn.vuejs.org/images/components_provide.png");
+
+var synchronousFile=function(id){
+  console.log( '开始同步文件，id 为: ' + id );
+};
+
+var proxySynchronousFile=(function(){
+  var cache=[];  //保存一段时间内需要同步的 ID
+  var timer;  //定时器
+  return function(id){
+    cache.push(id);
+    if (timer) {  //保证不会覆盖已经启动的定时器
+      return;
+    }
+    timer=setTimeout(function(){
+      synchronousFile(cache.join(","));  //2 秒后向本体发送需要同步的 ID 集合
+      clearTimeout(timer);  //清空定时器
+      timer=null;
+      cache.length=0;  //清空 ID 集合
+    },2000);
+  }
+})();
+
+var checkbox=document.getElementsByTagName("input");
+
+for ( var i = 0, c; c = checkbox[ i++ ]; ){
+  c.onclick = function(){
+    if ( this.checked === true ){
+      proxySynchronousFile( this.id );
+    }
+  }
+};
+
+var miniConsole=(function(){
+  var cache=[];
+  var handler=function(ev){
+    if (ev.keyCode=113) {
+      var script=document.createElement("script");
+      script.onload=function(){
+        for(var i=0,fn;fn=cache[i++];){
+          fn();
+        }
+      };
+      script.src="miniConsole.js";
+      document.getElementsByTagName("head")[0].appendChild(script);
+      document.body.removeEventListener("keydown",handler);  //只加载一次 miniConsole.js
+    }
+  };
+  document.body.addEventListener("keydown",handler,false);
+  return {
+    log:function(){
+      var args=arguments;
+      cache.push(function(){
+        return miniConsole.log.apply(miniConsole,args);
+      });
+    }
+  }
+  
+})();
+
+miniConsole.log(66);
+miniConsole.log(26);
+
+
+//计算乘积
+var mult = function(){
+   var a = 1;
+   for ( var i = 0, l = arguments.length; i < l; i++ ){
+      a = a * arguments[i];
+   }
+   return a;
+};
+//计算加和
+var plus = function(){
+   var a = 0;
+   for ( var i = 0, l = arguments.length; i < l; i++ ){
+      a = a + arguments[i];
+   }
+   return a;
+};
+
+//创建缓存代理的工厂
+var createProxyFactory = function( fn ){
+   var cache = {};
+   return function(){
+      var args = Array.prototype.join.call( arguments, ',' );
+      if ( args in cache ){
+         return cache[ args ];
+      }
+      return cache[ args ] = fn.apply( this, arguments );
+   }
+};
+
+
+var proxyMult = (function(){
+   var cache = {};
+   return function(){
+   var args = Array.prototype.join.call( arguments, ',' );
+   if ( args in cache ){
+      return cache[ args ];
+   }
+   return cache[ args ] = mult.apply( this, arguments );
+   }
+})();
+
+var proxyMult = createProxyFactory( mult ),
+proxyPlus = createProxyFactory( plus );
+
+console.log(proxyMult( 1, 2, 3, 4 ));
+console.log(proxyMult( 1, 2, 3, 4 ));
+console.log(proxyPlus( 1, 2, 3, 4 ));
+console.log(proxyPlus( 1, 2, 3, 4 ));
+
+/**
+ * @param {number[]} security
+ * @param {number} time
+ * @return {number[]}
+ */
+var goodDaysToRobBank = function(security, time) {
+   let ans=[];
+   let n=security.length;
+   let notbigthanbefore=new Array(n).fill(0);  //存储紧挨着当前元素之前连续非递增的元素个数
+   let notsmallthanlater=new Array(n).fill(0);  //存储紧挨着当前元素之后连续非递减的元素个数
+   let addcount=0;
+   let minuscount=0;
+   for(let i=1;i<n;i++){
+      if (security[i]>security[i-1]) {
+         notbigthanbefore[i]=0;
+         notsmallthanlater[i]=++addcount;
+         minuscount=0;
+      }else if(security[i]<security[i-1]){
+         notbigthanbefore[i]=++minuscount;
+         notsmallthanlater[i]=0;
+         addcount=0;
+      }else{
+         notbigthanbefore[i]=++minuscount;
+         notsmallthanlater[i]=++addcount;
+      }
+   }
+   //console.log(notbigthanbefore);
+   //console.log(notsmallthanlater);
+   for(let i=time;i<n-time;i++){
+      if (notbigthanbefore[i]>=time && notsmallthanlater[i+time]>=time) {
+         ans.push(i);
+      }
+   }
+   return ans;
+};
+
+let security = [1,2,3,4,5,6], time = 2;
+let result=goodDaysToRobBank(security,time);
+console.log(result);
+
+var each=function(arr,callback){
+   for(var i=0;i<arr.length;i++){
+      callback.call(arr[i],i,arr[i]);  //把下标和元素当作参数传给 callback 函数
+   }
+};
+
+var compare = function( ary1, ary2 ){
+   if ( ary1.length !== ary2.length ){
+      throw new Error ( 'ary1 和 ary2 不相等' );
+   }
+   each( ary1, function( i, n ){
+      if ( n !== ary2[ i ] ){
+         throw new Error ( 'ary1 和 ary2 不相等' );
+      }
+   });
+   console.log ( 'ary1 和 ary2 相等' );
+};
+
+compare( [ 1, 2, 3 ], [ 1, 2, 4 ] );
+
+var Iterator=function(obj){
+   var current=0;
+   var next=function(){
+      current+=1;
+   };
+   var isDone=function(){
+      return current>=obj.length;
+   };
+   var getCurrItem=function(){
+      return obj[current];
+   };
+   return {
+      next:next,
+      isDone:isDone,
+      getCurrItem:getCurrItem,
+      length:obj.length
+   }
+};
+
+var compare = function(iterator1,iterator2){
+   if ( iterator1.length !== iterator2.length ){
+      console.log( 'iterator1 和 iterator2 不相等' );
+      return;
+   }
+   while(!iterator1.isDone() && !iterator2.isDone()){
+      if (iterator1.getCurrItem()!==iterator2.getCurrItem()) {
+         console.log( 'iterator1 和 iterator2 不相等' );
+         return;
+      }
+      iterator1.next();
+      iterator2.next();
+   }
+   console.log ( 'iterator1 和 iterator2 相等' );
+};
+
+var iterator1 = Iterator( [ 1, 2, 3 ,4] );
+var iterator2 = Iterator( [ 1, 2, 3 ,5] );
+compare( iterator1, iterator2 ); 
+
+/**
+ * @param {string} s
+ * @param {number[][]} queries
+ * @return {number[]}
+ */
+var platesBetweenCandles = function(s, queries) {
+   let ans=new Array(queries.length).fill(0);
+   let n=s.length;
+   const preSum=new Array(n).fill(0);
+   for(let i=0,sum=0;i<n;i++){
+      if (s[i]==="*") {
+         sum++;
+      }
+      preSum[i]=sum;
+   }
+   const left=new Array(n).fill(0);
+   for(let i=0,l=-1;i<n;i++){
+      if (s[i]==="|") {
+         l=i;
+      }
+      left[i]=l;
+   }
+   const right=new Array(n).fill(0);
+   for(let i=n-1,r=-1;i>=0;i--){
+      if (s[i]==="|") {
+         r=i;
+      }
+      right[i]=r;
+   }
+   for(let i=0;i<queries.length;i++){
+      let x=right[queries[i][0]];
+      let y=left[queries[i][1]];
+      ans[i]=x===-1 || y===-1 || x>=y ? 0: preSum[y]-preSum[x];
+   }
+   return ans;
+};
+
+let s = "**|**|***|", queries = [[2,5],[5,9]];
+let result=platesBetweenCandles(s,queries);
+console.log(result);
+
+var event={
+   clientList:{},
+   listen:function(key,fn){
+      if (!this.clientList[key]) {
+         this.clientList[key]=[];
+      }
+      this.clientList[key].push(fn);  //订阅的消息添加进缓存列表
+   },
+   trigger:function(){  //发布消息
+      var key=Array.prototype.shift.call(arguments);  //取出消息类型
+      var fns=this.clientList[key];  //取出该消息对应的回调函数集合
+      if (!fns || fns.length===0) {
+         return false;  //如果没有订阅该消息，则返回
+      }
+      for(let i=0,fn;fn=fns[i++];){
+         fn.apply(this,arguments);  // arguments 是发布消息时带上的参数
+      }
+   },
+   remove:function(key,fn){
+      var fns=this.clientList[key];
+      if (!fns) {
+         return false;  //如果 key 对应的消息没有被人订阅，则直接返回
+      }
+      if (!fn) {
+         //如果没有传入具体的回调函数，表示需要取消 key 对应消息的所有订阅
+         fns && (fns.length=0);
+      }else{
+         for(let i=fns.length-1;i>=0;i--){  //反向遍历订阅的回调函数列表
+            let _fn=fns[i];
+            if (_fn===fn) {
+               fns.splice(i,1);  //删除订阅者的回调函数
+            }
+         }
+      }
+
+   }
+}
+
+
+var installEvent=function(obj){
+   for (var i in event){
+      obj[i]=event[i];
+   }
+}
+var salesOffices={};  //定义售楼处
+
+installEvent(salesOffices);
+
+var fn1=function( price ){ // 小明订阅 88 平方米房子的消息
+   console.log( '价格= ' + price ); // 输出： 2000000
+}
+var fn2=function( price ){ // 小红订阅 110 平方米房子的消息
+   console.log( '价格= ' + price ); // 输出： 3000000
+}
+
+salesOffices.listen( 'squareMeter88', fn1);
+
+salesOffices.listen( 'squareMeter110', fn2);
+salesOffices.remove("squareMeter88",fn1)
+salesOffices.trigger( 'squareMeter88', 2000000 ); // 发布 88 平方米房子的价格
+salesOffices.trigger( 'squareMeter110', 3000000 ); // 发布 110 平方米房子的价格
+
+  var button1 = document.getElementById( 'button1' );
+  var button2 = document.getElementById( 'button2' );
+  var button3 = document.getElementById( 'button3' );
+
+  var setCommand=function(button,command){
+    button.onclick=function(){
+      command.execute();
+    }
+  };
+
+  var MenuBar={
+    refresh:function(){
+      console.log("刷新菜单目录");
+    }
+  };
+  var RefreshMenuBarCommand=function(receiver){
+    return {
+      execute:function(){
+        receiver.refresh();
+      },
+    };
+  };
+  var refreshMenuBarCommand=new RefreshMenuBarCommand(MenuBar);
+
+  setCommand(button1,refreshMenuBarCommand);
+
+
+
+
+  var SubMenu={
+    add:function(){
+      console.log("增加子菜单");
+    },
+    del:function(){
+      console.log("删除子菜单");
+    }
+  };
+
+  
+  var AddSubMenuCommand = function( receiver ){
+    this.receiver = receiver;
+  };
+  AddSubMenuCommand.prototype.execute = function(){
+    this.receiver.add();
+  };
+  var DelSubMenuCommand = function( receiver ){
+    this.receiver = receiver;
+  };
+  DelSubMenuCommand.prototype.execute = function(){
+    this.receiver.del();
+  };
+
+  var refreshMenuBarCommand=new RefreshMenuBarCommand(MenuBar);
+  var addSubMenuCommand=new AddSubMenuCommand(SubMenu);
+  var delSubMenuCommand=new DelSubMenuCommand(SubMenu);
+
+  setCommand(button1,refreshMenuBarCommand);
+  setCommand(button2,addSubMenuCommand);
+  setCommand(button3,delSubMenuCommand);
+
+var MacroCommand=function(){
+   return {
+      commandList:[],
+      add:function(command){
+         this.commandList.push(command);
+      },
+      execute:function(){
+         for (let i=0;i<this.commandList.length;i++){
+            this.commandList[i].execute()
+         }
+      }
+   }
+};
+var openAcCommand = {
+   execute: function(){
+      console.log( '打开空调' );
+   }
+};
+
+//家里的电视和音响是连接在一起的，所以可以用一个宏命令来组合打开电视和打开音响的命令
+var openTvCommand = {
+   execute: function(){
+      console.log( '打开电视' );
+   },
+   add:function(){
+      throw new Error("叶对象不能添加子节点")
+   }
+};
+var openSoundCommand = {
+   execute: function(){
+      console.log( '打开音响' );
+   }
+};
+var macroCommand1 = MacroCommand();
+macroCommand1.add( openTvCommand );
+macroCommand1.add( openSoundCommand );
+
+
+var closeDoorCommand = {
+   execute: function(){
+      console.log( '关门' );
+   }
+};
+var openPcCommand = {
+   execute: function(){
+      console.log( '开电脑' );
+   }
+};
+var openQQCommand = {
+   execute: function(){
+      console.log( '登录 QQ' );
+   }
+};
+
+var macroCommand2 = MacroCommand();
+macroCommand2.add( closeDoorCommand );
+macroCommand2.add( openPcCommand );
+macroCommand2.add( openQQCommand );
+
+//现在把所有的命令组合成一个“超级命令”
+
+var macroCommand = MacroCommand();
+macroCommand.add( openAcCommand );
+macroCommand.add( macroCommand1 );
+macroCommand.add( macroCommand2 );
+
+(function( command ){
+   command.execute();
+   }
+)( macroCommand );
+
+var Folder=function(name){
+   this.name=name;
+   this.files=[];
+};
+
+Folder.prototype.add=function(file){
+   this.files.push(file);
+}
+
+Folder.prototype.scan=function(){
+   console.log( '开始扫描文件夹: ' + this.name );
+   for(let i=0;i<this.files.length;i++){
+      this.files[i].scan();
+   }
+};
+
+var File=function(name){
+   this.name=name;
+};
+
+File.prototype.add=function(){
+   throw new Error("文件下面不能再添加文件");
+}
+
+File.prototype.scan=function(){
+   console.log( '开始扫描文件: ' + this.name );
+}
+
+var folder = new Folder( '学习资料' );
+var folder1 = new Folder( 'JavaScript' );
+var folder2 = new Folder ( 'jQuery' );
+var file1 = new File( 'JavaScript 设计模式与开发实践' );
+var file2 = new File( '精通 jQuery' );
+var file3 = new File( '重构与模式' )
+folder1.add( file1 );
+folder2.add( file2 );
+folder.add( folder1 );
+folder.add( folder2 );
+folder.add( file3 );
+
+var folder3 = new Folder( 'Nodejs' );
+var file4 = new File( '深入浅出 Node.js' );
+folder3.add( file4 );
+var file5 = new File( 'JavaScript 语言精髓与编程实践' );
+
+folder.add( folder3 );
+folder.add( file5 );
+
+folder.scan();
+
+var Beverage=function(param){
+
+   var boilWater = function(){
+      console.log( '把水煮沸' );
+   };
+
+   var brew =param.brew || function(){
+      throw new Error( '子类必须重写 brew 方法' );
+   };
+   var pourInCup =param.pourInCup || function(){
+      throw new Error( '子类必须重写 pourInCup 方法' );
+   };
+   var addCondiments =param.addCondiments || function(){
+      throw new Error( '子类必须重写 addCondiments 方法' );
+   };
+   
+   var F=function(){};
+
+   F.prototype.init=function(){
+      boilWater();
+      brew();
+      pourInCup();
+      addCondiments();
+   }
+
+   return F;
+};
+
+var Coffee = Beverage({
+   brew: function(){
+      console.log( '用沸水冲泡咖啡' );
+   },
+   pourInCup: function(){
+      console.log( '把咖啡倒进杯子' );
+   },
+   addCondiments: function(){
+      console.log( '加糖和牛奶' );
+   }
+});
+
+var Tea = Beverage({
+   brew: function(){
+      console.log( '用沸水浸泡茶叶' );
+   },
+   pourInCup: function(){
+      console.log( '把茶倒进杯子' );
+   },
+   addCondiments: function(){
+      console.log( '加柠檬' );
+   }
+});
+
+var coffee = new Coffee();
+coffee.init();
+var tea = new Tea();
+tea.init();
+
+var Upload = function( uploadType){
+  this.uploadType = uploadType;
+};
+
+Upload.prototype.delFile = function(){
+  uploadManager.setExternalState( id, this ); // (1)
+  if ( this.fileSize < 3000 ){
+    return this.dom.parentNode.removeChild( this.dom );
+  }
+  if ( window.confirm( '确定要删除该文件吗? ' + this.fileName ) ){
+    return this.dom.parentNode.removeChild( this.dom );
+  }
+};
+
+var UploadFactory = (function(){
+  var createdFlyWeightObjs = {};
+  return {
+    create: function( uploadType){
+      if ( createdFlyWeightObjs [ uploadType] ){
+        return createdFlyWeightObjs [ uploadType];
+      }
+      return createdFlyWeightObjs [ uploadType] = new Upload( uploadType);
+      }
+  }
+})();
+
+var uploadManager = (function(){
+  var uploadDatabase = {};
+  return {
+    add: function( id, uploadType, fileName, fileSize ){
+      var flyWeightObj = UploadFactory.create( uploadType );
+      var dom = document.createElement( 'div' );
+      dom.innerHTML =
+      '<span>文件名称:'+ fileName +', 文件大小: '+ fileSize +'</span>' +
+      '<button class="delFile">删除</button>';
+      dom.querySelector( '.delFile' ).onclick = function(){
+        flyWeightObj.delFile( id );
+      }
+      document.body.appendChild( dom );
+      uploadDatabase[ id ] = {
+        fileName: fileName,
+        fileSize: fileSize,
+        dom: dom
+      };
+      return flyWeightObj ;
+    },
+    setExternalState: function( id, flyWeightObj ){
+      var uploadData = uploadDatabase[ id ];
+      for ( var i in uploadData ){
+        flyWeightObj[ i ] = uploadData[ i ];
+      }
+    }
+  }
+})();
+
+var id = 0;
+window.startUpload = function( uploadType, files ){ // uploadType 区分是控件还是 flash
+  for ( var i = 0, file; file = files[ i++ ]; ){
+    var uploadObj = uploadManager.add( ++id, uploadType, file.fileName, file.fileSize );
+  }
+};
+
+startUpload( 'plugin', [
+  {
+  fileName: '1.txt',
+  fileSize: 1000
+  },
+  {
+  fileName: '2.html',
+  fileSize: 3000
+  },
+  {
+  fileName: '3.txt',
+  fileSize: 5000
+  }
+]);
+
+startUpload( 'flash', [
+  {
+  fileName: '4.txt',
+  fileSize: 1000
+  },
+  {
+  fileName: '5.html',
+  fileSize: 3000
+  },
+  {
+  fileName: '6.txt',
+  fileSize: 5000
+  }
+]);
+
+var toolTipFactory=(function(){
+  var toolTipPool=[];  //toolTip 对象池
+  return {
+    create:function(){
+      if (toolTipPool.length===0) {  //如果对象池为空
+        var div=document.createElement("div");  // 创建一个 dom
+        document.body.appendChild(div);
+        return div;
+      }else{  // 如果对象池里不为空
+        return toolTipPool.shift();  // 则从对象池中取出一个 dom
+      }
+    },
+    recover:function(toolTipDom){
+      return toolTipPool.push(toolTipDom);  //对象池回收 dom
+    }
+  }
+})();
+
+var arr=[];
+let str=["A","B"];
+for (let i=0;i<str.length;i++){
+  let toolTip=toolTipFactory.create();
+  toolTip.innerHTML=str[i];
+  arr.push(toolTip);
+}
+
+for (let i=0;i<arr.length;i++){
+  toolTipFactory.recover(arr[i]);
+}
+
+str=[ 'A', 'B', 'C', 'D', 'E', 'F' ];
+for (let i=0;i<str.length;i++){
+  let toolTip=toolTipFactory.create();
+  toolTip.innerHTML=str[i];
+}
+
+var objectPoolFactory=function(createObjFn){
+  var objectPool=[];
+  return {
+    create:function(){
+      var obj=objectPool.length===0 ? createObjFn.apply(this,arguments) : objectPool.shift();
+      return obj;
+    },
+    recover:function(obj){
+      objectPool.push(obj);
+    }
+  }
+};
+
+var iframeFactory = objectPoolFactory( function(){
+  var iframe = document.createElement( 'iframe' );
+  document.body.appendChild( iframe );
+  iframe.onload = function(){
+    iframe.onload = null; // 防止 iframe 重复加载的 bug
+    iframeFactory.recover( iframe ); // iframe 加载完成之后回收节点
+  }
+  return iframe;
+});
+
+var iframe1 = iframeFactory.create();
+iframe1.src = 'http:// baidu.com';
+var iframe2 = iframeFactory.create();
+iframe2.src = 'http:// QQ.com';
+
+setTimeout(function(){
+  var iframe3 = iframeFactory.create();
+    iframe3.src = 'http:// 163.com';
+}, 3000 );
+
+  /** 递归地从子节点获取文本 */
+  function getChildrenTextContent(children){
+    return children.map(node=>{
+      return typeof node.children==="string" ? 
+      node.children : 
+      Array.isArray(node.children) ? 
+      getChildrenTextContent(node.children) : "";
+    }).join("");
+  }
+
+  const {createApp,h}=Vue;
+  const app=createApp({});
+
+  app.component("anchored-heading",{
+    render(){
+      // 从 children 的文本内容中创建短横线分隔 (kebab-case) id。
+      const headingId=getChildrenTextContent(this.$slots.default())
+        .toLowerCase()
+        .replace(/\W+/g,"-")  //用短横线替换非单词字符
+        .replace(/(^-|-$)/g,"");  // 删除前后短横线
+      return h('h'+this.level,[
+        h('a',{
+            name:headingId,
+            href:"#"+headingId
+          },
+          this.$slots.default()
+        )
+        ]);
+    },
+    props:{
+      level:{
+        type:Number,
+        required:true,
+      }
+    }
+  });
+ 
+  app.mount("#app");
+var order500=function(orderType,pay,stock){
+   if (orderType===1 && pay===true) {
+      console.log( '500 元定金预购, 得到 100 优惠券' );
+   }else{
+      return "nextSuccessor";  // 不知道下一个节点是谁，反正把请求往后面传递
+   }
+}
+
+var order200=function(orderType,pay,stock){
+   if (orderType===2 && pay===true) {
+      console.log( '200 元定金预购, 得到 50 优惠券' );
+   }else{
+      return "nextSuccessor";  // 不知道下一个节点是谁，反正把请求往后面传递
+   }
+}
+
+var orderNormal=function(orderType,pay,stock){
+   if (stock>0) {
+      console.log( '普通购买, 无优惠券' );
+   }else{
+      console.log( '手机库存不足' );
+   }
+}
+
+var Chain=function(fn){
+   this.fn=fn;
+   this.successor=null;
+}
+//指定在链中的下一个节点
+Chain.prototype.setNextSuccessor=function(successor){
+   return this.successor=successor;
+}
+//传递请求给某个节点
+Chain.prototype.passRequest=function(){
+   var ret=this.fn.apply(this,arguments);
+   if (ret==="nextSuccessor") {
+      return this.successor && this.successor.passRequest.apply(this.successor,arguments);
+   }
+   return ret;
+}
+Chain.prototype.next=function(){
+   return this.successor && this.successor.passRequest.apply(this.successor.arguments);
+}
+
+Function.prototype.after = function( fn ){
+   var self = this;
+   return function(){
+      var ret = self.apply( this, arguments );
+      if ( ret === 'nextSuccessor' ){
+         return fn.apply( this, arguments );
+      }
+      return ret;
+   }
+};
+var order = order500yuan.after( order200yuan ).after( orderNormal );
+order( 1, true, 500 ); // 输出：500 元定金预购，得到 100 优惠券
+order( 2, true, 500 ); // 输出：200 元定金预购，得到 50 优惠券
+order( 1, false, 500 ); // 输出：普通购买，无优惠券
+
+
+function Player(name,teamColor){
+    this.state = 'alive'; // 玩家状态
+    this.name = name; // 角色名字
+    this.teamColor = teamColor; // 队伍颜色
+};
+Player.prototype.win=function(){
+    console.log( this.name + ' won ' );
+};
+Player.prototype.lose=function(){
+    console.log( this.name +' lost' );
+};
+
+Player.prototype.die=function(){
+    this.state = 'dead';
+    playerDirector.reciveMessage('playerDead', this ); // 给中介者发送消息，玩家死亡
+};
+Player.prototype.remove=function(){
+    playerDirector.reciveMessage("removePlayer",this);  // 给中介者发送消息，移除一个玩家
+};
+Player.prototype.changeTeam=function(color){
+    playerDirector.reciveMessage("changeTeam",this,color);  //给中介者发送消息，玩家换队
+}
+
+//最后定义一个工厂来创建玩家：
+var playerFactory=function(name,teamColor){
+    var newPlayer=new Player(name,teamColor);  //创建新玩家
+    playerDirector.reciveMessage("addPlayer",newPlayer);  //给中介者发送消息，新增玩家
+    return newPlayer;
+}
+
+var playerDirector=(function(){
+    var players={};  //保存所有玩家
+    var operations={};  // 中介者可以执行的操作
+
+    operations.addPlayer=function(player){
+        //新增一个玩家
+        var teamColor=player.teamColor;  //玩家的队伍颜色
+        players[teamColor]=players[teamColor] || [];  // 如果该颜色的玩家还没有成立队伍，则新成立一个队伍
+        players[teamColor].push(player);  //添加玩家进队伍
+    };
+
+    operations.removePlayer=function(player){
+        //移除一个玩家
+        var teamColor=player.teamColor;
+        var teamPlayers=players[teamColor] || [];  //该队伍所有成员
+        for (let i=teamPlayers.length-1;i>=0;i--){
+            //遍历删除
+            if (teamPlayers[i]===player) {
+                teamPlayers.splice(i,1);
+            }
+        }
+    };
+
+    operations.changeTeam=function(player,newTeamColor){
+        //玩家换队
+        operations.removePlayer(player);  //从原队伍中删除
+        player.teamColor=newTeamColor;  //改变队伍颜色
+        operations.addPlayer(player);  //增加到新队伍中
+    };
+
+    operations.playerDead=function(player){
+        //玩家死亡
+        var teamColor=player.teamColor;
+        teamPlayers=players[teamColor];  //玩家所在队伍
+
+        var all_dead=true;
+
+        for (let i=0;i<teamPlayers.length;i++){
+            //遍历队友列表
+            if (teamPlayers[i].state!=="dead") {
+                //如果还有一个队友没有死亡，则游戏还未失败
+                all_dead=false;
+                break;
+            }
+        }
+        if (all_dead===true) {  // 如果队友全部死亡
+            for (let i=0;i<teamPlayers.length;i++){
+                // 通知所有队友玩家游戏失败
+                teamPlayers[i].lose();  //本队所有玩家 lose
+            }
+            for(let color in players){
+                if (color!==teamColor) {
+                    var teamPlayers = players[ color ];  // 其他队伍的玩家
+                    for (let i=0;i<teamPlayers.length;i++){
+                        teamPlayers[i].win();  // 其他队伍所有玩家 win
+                    }
+                }
+            }
+            
+        }
+    };
+
+    var reciveMessage=function(){
+        var message=Array.prototype.shift.call(arguments);  //arguments 的第一个参数为消息名称
+        operations[message].apply(this,arguments);
+    };
+
+    return {reciveMessage:reciveMessage}
+})();
+
+
+
+var player1=playerFactory("Mane","red");
+var player2=playerFactory("Alison","red");
+var player3=playerFactory("Arnold","red");
+var player4=playerFactory("Salah","red");
+
+var player5=playerFactory("mendy","blue");
+var player6=playerFactory("kaipa","blue");
+var player7=playerFactory("lukaku","blue");
+var player8=playerFactory("mount","blue");
+/*
+player5.die();
+player6.die();
+player7.die();
+player8.die();
+*/
+/*
+player1.remove();
+player2.remove();
+player3.die();
+player4.die()
+*/
+
+player1.changeTeam( 'blue' );
+player2.die();
+player3.die();
+player4.die();
+
 
